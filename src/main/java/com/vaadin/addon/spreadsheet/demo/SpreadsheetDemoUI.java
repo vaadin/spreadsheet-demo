@@ -23,7 +23,7 @@ import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeEvent;
 import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeListener;
 import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
 import com.vaadin.addon.spreadsheet.SpreadsheetFactory;
-import com.vaadin.addon.spreadsheet.demo.action.SpreadsheetDefaultActionHandler;
+import com.vaadin.addon.spreadsheet.action.SpreadsheetDefaultActionHandler;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -54,7 +54,7 @@ import com.vaadin.ui.Window;
  * place spreadsheet files on the classpath, under the folder /testsheets/, and
  * they will be picked up in a combobox in the menu.
  * 
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class SpreadsheetDemoUI extends UI implements Receiver {
