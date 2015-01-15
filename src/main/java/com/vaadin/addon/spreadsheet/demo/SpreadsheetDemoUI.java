@@ -8,15 +8,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellReference;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
-import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedCellWriteAttemptedEvent;
-import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedCellWriteAttemptedListener;
+import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditEvent;
+import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditListener;
 import com.vaadin.addon.spreadsheet.Spreadsheet.SelectedSheetChangeEvent;
 import com.vaadin.addon.spreadsheet.Spreadsheet.SelectedSheetChangeListener;
 import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeEvent;
@@ -162,6 +165,30 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                     }
                 });
 
+        Button test = new Button("styletest", new Button.ClickListener() {
+
+            private int size = 12;
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                Cell cell = spreadsheet.getCell("A1");
+                CellStyle newStyle = spreadsheet.getWorkbook()
+                        .createCellStyle();
+                Font font = spreadsheet.getWorkbook().createFont();
+                font.setItalic(true);
+                font.setColor(Font.COLOR_RED);
+                font.setFontHeightInPoints((short) size++);
+                newStyle.setFont(font);
+                cell.setCellStyle(newStyle);
+                // Font fontAt = spreadsheet.getWorkbook().getFontAt(fontIndex);
+                // fontAt.setFontHeightInPoints((short) (fontAt
+                // .getFontHeightInPoints() + 1));
+                spreadsheet.refreshCells(cell);
+                spreadsheet.reloadVisibleCellContents();
+                spreadsheet.reloadActiveSheetStyles();
+            }
+        });
+
         Button newSpreadsheetInWindowButton = new Button("New in Window",
                 new Button.ClickListener() {
 
@@ -239,6 +266,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         checkBoxLayout.addComponents(gridlines, rowColHeadings);
         options.addComponent(checkBoxLayout);
         options.addComponent(newSpreadsheetButton);
+        options.addComponent(test);
         options.addComponent(newSpreadsheetInWindowButton);
         options.addComponent(customComponentTest);
         options.addComponent(openTestSheetSelect);
@@ -321,10 +349,9 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 int i = previousFile.getName().lastIndexOf(".xls");
                 String fileName = previousFile.getName().substring(0, i)
                         + ("(1)") + previousFile.getName().substring(i);
-                previousFile = spreadsheet.writeSpreadsheetIntoFile(fileName);
+                previousFile = spreadsheet.write(fileName);
             } else {
-                previousFile = spreadsheet
-                        .writeSpreadsheetIntoFile("workbook1");
+                previousFile = spreadsheet.write("workbook1");
             }
             download.setEnabled(true);
             FileResource resource = new FileResource(previousFile);
@@ -363,8 +390,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
     private void printSelectionChangeEventContents(SelectionChangeEvent event) {
 
-        CellReference[] allSelectedCells = event.getAllSelectedCells();
-        spreadsheet.setInfoLabelValue(allSelectedCells.length
+        Set<CellReference> allSelectedCells = event.getAllSelectedCells();
+        spreadsheet.setInfoLabelValue(allSelectedCells.size()
                 + " selected cells");
 
         // System.out.println(event.getSelectedCellReference().toString());
@@ -389,11 +416,10 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                         .addSelectedSheetChangeListener(selectedSheetChangeListener);
                 spreadsheet.addActionHandler(spreadsheetActionHandler);
                 spreadsheet
-                        .addProtectedCellWriteAttemptedListener(new ProtectedCellWriteAttemptedListener() {
+                        .addProtectedEditListener(new ProtectedEditListener() {
 
                             @Override
-                            public void writeAttempted(
-                                    ProtectedCellWriteAttemptedEvent event) {
+                            public void writeAttempted(ProtectedEditEvent event) {
                                 Notification
                                         .show("This cell is protected and cannot be changed");
                             }
@@ -404,7 +430,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 if (previousFile == null
                         || !previousFile.getAbsolutePath().equals(
                                 file.getAbsolutePath())) {
-                    spreadsheet.reloadSpreadsheetFrom(file);
+                    spreadsheet.read(file);
                 }
             }
             spreadsheet.setSpreadsheetComponentFactory(null);
@@ -412,9 +438,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             save.setEnabled(true);
             download.setEnabled(false);
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {

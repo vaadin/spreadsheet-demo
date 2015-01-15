@@ -154,8 +154,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 Cell cell = getSpreadsheet().getCell(cr.getRow(), cr.getCol());
                 if (cell != null) {
                     cell.setCellValue(s);
-                    getSpreadsheet().markCellAsUpdated(cell, false);
-                    getSpreadsheet().updateMarkedCells();
+                    getSpreadsheet().refreshCells(cell);
                 }
             }
         });
@@ -177,8 +176,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                     Date value = dateField.getValue();
                     if (oldValue != null && !oldValue.equals(value)) {
                         cell.setCellValue(value);
-                        getSpreadsheet().markCellAsUpdated(cell, false);
-                        getSpreadsheet().updateMarkedCells();
+                        getSpreadsheet().refreshCells(cell);
                     }
                 } catch (IllegalStateException ise) {
                     ise.printStackTrace();
@@ -202,8 +200,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                     Boolean oldValue = cell.getBooleanCellValue();
                     if (value != oldValue) {
                         cell.setCellValue(value);
-                        getSpreadsheet().markCellAsUpdated(cell, false);
-                        getSpreadsheet().updateMarkedCells();
+                        getSpreadsheet().refreshCells(cell);
                     }
                 } catch (IllegalStateException ise) {
                     ise.printStackTrace();
