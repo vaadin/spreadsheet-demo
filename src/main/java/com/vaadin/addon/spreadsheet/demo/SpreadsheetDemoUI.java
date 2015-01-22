@@ -320,7 +320,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             layout.addComponent(spreadsheet);
             layout.setExpandRatio(spreadsheet, 1.0f);
         } else {
-            spreadsheet.reloadSpreadsheetWithNewWorkbook();
+            spreadsheet.reset();
         }
         spreadsheet.setSpreadsheetComponentFactory(null);
         save.setEnabled(true);
