@@ -139,7 +139,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 Boolean display = (Boolean) event.getProperty().getValue();
 
                 if (spreadsheet != null) {
-                    spreadsheet.setDisplayGridlines(display);
+                    spreadsheet.setGridlinesVisible(display);
                 }
             }
         });
@@ -151,7 +151,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 Boolean display = (Boolean) event.getProperty().getValue();
 
                 if (spreadsheet != null) {
-                    spreadsheet.setDisplayRowColHeadings(display);
+                    spreadsheet.setRowColHeadingsVisible(display);
                 }
             }
         });
@@ -327,8 +327,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         previousFile = null;
         openTestSheetSelect.setValue(null);
 
-        gridlines.setValue(spreadsheet.isDisplayGridLines());
-        rowColHeadings.setValue(spreadsheet.isDisplayRowColHeadings());
+        gridlines.setValue(spreadsheet.isGridlinesVisible());
+        rowColHeadings.setValue(spreadsheet.isRowColHeadingsVisible());
     }
 
     protected void createNewSheetInWindow() {
@@ -384,8 +384,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             spreadsheet.setSpreadsheetComponentFactory(spreadsheetFieldFactory);
         }
 
-        gridlines.setValue(spreadsheet.isDisplayGridLines());
-        rowColHeadings.setValue(spreadsheet.isDisplayRowColHeadings());
+        gridlines.setValue(spreadsheet.isGridlinesVisible());
+        rowColHeadings.setValue(spreadsheet.isRowColHeadingsVisible());
     }
 
     private void printSelectionChangeEventContents(SelectionChangeEvent event) {
