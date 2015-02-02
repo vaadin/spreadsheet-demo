@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +17,11 @@ import javax.servlet.annotation.WebServlet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditEvent;
@@ -34,11 +40,14 @@ import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.colorpicker.Color;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ColorPicker;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -49,6 +58,8 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
+import com.vaadin.ui.components.colorpicker.ColorChangeListener;
 
 /**
  * Demo class for the Spreadsheet component.
@@ -120,6 +131,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
     }
 
     private void buildOptions() {
+        VerticalLayout menuBar = new VerticalLayout();
+
         HorizontalLayout options = new HorizontalLayout();
         options.setSpacing(true);
 
@@ -164,30 +177,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                         createNewSheet();
                     }
                 });
-
-        Button test = new Button("styletest", new Button.ClickListener() {
-
-            private int size = 12;
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                Cell cell = spreadsheet.getCell("A1");
-                CellStyle newStyle = spreadsheet.getWorkbook()
-                        .createCellStyle();
-                Font font = spreadsheet.getWorkbook().createFont();
-                font.setItalic(true);
-                font.setColor(Font.COLOR_RED);
-                font.setFontHeightInPoints((short) size++);
-                newStyle.setFont(font);
-                cell.setCellStyle(newStyle);
-                // Font fontAt = spreadsheet.getWorkbook().getFontAt(fontIndex);
-                // fontAt.setFontHeightInPoints((short) (fontAt
-                // .getFontHeightInPoints() + 1));
-                spreadsheet.refreshCells(cell);
-                spreadsheet.reloadVisibleCellContents();
-                spreadsheet.reloadActiveSheetStyles();
-            }
-        });
 
         Button newSpreadsheetInWindowButton = new Button("New in Window",
                 new Button.ClickListener() {
@@ -266,7 +255,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         checkBoxLayout.addComponents(gridlines, rowColHeadings);
         options.addComponent(checkBoxLayout);
         options.addComponent(newSpreadsheetButton);
-        options.addComponent(test);
         options.addComponent(newSpreadsheetInWindowButton);
         options.addComponent(customComponentTest);
         options.addComponent(openTestSheetSelect);
@@ -297,7 +285,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         sheetOptions.setSpacing(true);
         sheetOptions.addComponent(save);
         sheetOptions.addComponent(download);
-        layout.addComponent(options);
 
         upload.setImmediate(true);
         upload.addSucceededListener(new SucceededListener() {
@@ -307,6 +294,122 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 loadFile(uploadedFile);
             }
         });
+
+        HorizontalLayout styleOptions = new HorizontalLayout();
+
+        Button boldButton = new Button(FontAwesome.BOLD);
+        Button italicButton = new Button(FontAwesome.ITALIC);
+        ColorPicker backgroundColor = new ColorPicker("Background Color");
+        backgroundColor.setIcon(FontAwesome.FONT);
+        backgroundColor.setCaption("Background Color");
+        boldButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                for (CellReference cellRef : spreadsheet
+                        .getSelectedCellReferences()) {
+                    Cell cell = getOrCreateCell(cellRef);
+                    CellStyle style = cloneStyle(cell);
+                    Font font = cloneFont(style);
+                    font.setBold(!font.getBold());
+                    style.setFont(font);
+                    cell.setCellStyle(style);
+                    cellsToRefresh.add(cell);
+                }
+                spreadsheet.refreshCells(cellsToRefresh);
+            }
+        });
+
+        italicButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                for (CellReference cellRef : spreadsheet
+                        .getSelectedCellReferences()) {
+                    Cell cell = getOrCreateCell(cellRef);
+                    CellStyle style = cloneStyle(cell);
+                    Font font = cloneFont(style);
+                    font.setItalic(!font.getItalic());
+                    style.setFont(font);
+                    cell.setCellStyle(style);
+                    cellsToRefresh.add(cell);
+                }
+                spreadsheet.refreshCells(cellsToRefresh);
+            }
+        });
+
+        backgroundColor.addColorChangeListener(new ColorChangeListener() {
+
+            @Override
+            public void colorChanged(ColorChangeEvent event) {
+
+                List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                for (CellReference cellRef : spreadsheet
+                        .getSelectedCellReferences()) {
+                    Cell cell = getOrCreateCell(cellRef);
+                    if (spreadsheet.getWorkbook() instanceof XSSFWorkbook) {
+                        XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
+                        Color newColor = event.getColor();
+                        if (newColor != null) {
+                            XSSFColor color = new XSSFColor(java.awt.Color
+                                    .decode(newColor.getCSS()));
+                            style.setFillForegroundColor(color);
+                            cell.setCellStyle(style);
+                        }
+                    } else {
+                        CellStyle style = cloneStyle(cell);
+                        style.setFillForegroundColor(IndexedColors.GREEN
+                                .getIndex());
+                        cell.setCellStyle(style);
+                    }
+                    cellsToRefresh.add(cell);
+                }
+                spreadsheet.refreshCells(cellsToRefresh);
+            }
+        });
+
+        styleOptions.addComponent(boldButton);
+        styleOptions.addComponent(italicButton);
+        styleOptions.addComponent(backgroundColor);
+
+        menuBar.addComponent(options);
+        menuBar.addComponent(styleOptions);
+        layout.addComponent(menuBar);
+
+    }
+
+    private Cell getOrCreateCell(CellReference cellRef) {
+        Cell cell = spreadsheet.getCell(cellRef.getRow(), cellRef.getCol());
+        if (cell == null) {
+            cell = spreadsheet.createCell(cellRef.getRow(), cellRef.getCol(),
+                    "");
+        }
+        return cell;
+    }
+
+    private CellStyle cloneStyle(Cell cell) {
+        CellStyle style = spreadsheet.getWorkbook().createCellStyle();
+        style.cloneStyleFrom(cell.getCellStyle());
+        return style;
+    }
+
+    private Font cloneFont(CellStyle cellstyle) {
+        Font newFont = spreadsheet.getWorkbook().createFont();
+        Font originalFont = spreadsheet.getWorkbook().getFontAt(
+                cellstyle.getFontIndex());
+        if (originalFont != null) {
+            newFont.setBold(originalFont.getBold());
+            newFont.setItalic(originalFont.getItalic());
+            newFont.setColor(originalFont.getColor());
+            newFont.setFontHeight(originalFont.getFontHeight());
+            newFont.setUnderline(originalFont.getUnderline());
+            newFont.setStrikeout(originalFont.getStrikeout());
+        }
+
+        return newFont;
+
     }
 
     protected void createNewSheet() {
