@@ -1,5 +1,7 @@
 package com.vaadin.addon.spreadsheet.demo;
 
+import static com.vaadin.ui.themes.ValoTheme.THEME_NAME;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,6 +35,7 @@ import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeListener;
 import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
 import com.vaadin.addon.spreadsheet.SpreadsheetFactory;
 import com.vaadin.addon.spreadsheet.action.SpreadsheetDefaultActionHandler;
+import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -44,6 +47,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.colorpicker.Color;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
@@ -71,6 +75,7 @@ import com.vaadin.ui.components.colorpicker.ColorChangeListener;
  * 
  */
 @SuppressWarnings("serial")
+@Theme(THEME_NAME)
 public class SpreadsheetDemoUI extends UI implements Receiver {
 
     @WebServlet(value = "/*", asyncSupported = true)
@@ -80,7 +85,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
     VerticalLayout layout = new VerticalLayout();
 
-    Upload upload = new Upload("Upload a XLS file to view it", this);
+    Upload upload = new Upload();
     private File previousFile = null;
 
     private Button save;
@@ -132,17 +137,20 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
     private void buildOptions() {
         VerticalLayout menuBar = new VerticalLayout();
+        menuBar.setSpacing(true);
 
         HorizontalLayout options = new HorizontalLayout();
         options.setSpacing(true);
 
         layout.setMargin(true);
+        layout.setSpacing(true);
+
         layout.setSizeFull();
 
-        gridlines = new CheckBox("display grid lines");
+        gridlines = new CheckBox("grid lines");
         gridlines.setImmediate(true);
 
-        rowColHeadings = new CheckBox("display row and column headers");
+        rowColHeadings = new CheckBox("headers");
         rowColHeadings.setImmediate(true);
 
         gridlines.addValueChangeListener(new ValueChangeListener() {
@@ -169,7 +177,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             }
         });
 
-        Button newSpreadsheetButton = new Button("Create new",
+        Button newSpreadsheetButton = new Button("New Spreadsheet",
                 new Button.ClickListener() {
 
                     @Override
@@ -212,8 +220,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 }
             }
         });
-        openTestSheetSelect = new ComboBox("Open test sheet",
-                testSheetContainer);
+        openTestSheetSelect = new ComboBox(null, testSheetContainer);
         openTestSheetSelect.setPageLength(0);
         openTestSheetSelect.setImmediate(true);
         openTestSheetSelect.setItemCaptionPropertyId("Name");
@@ -241,8 +248,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         download = new Button("Download");
         download.setEnabled(false);
 
-        Button customComponentTest = new Button(
-                "Create Custom Editor Test sheet", new Button.ClickListener() {
+        Button customComponentTest = new Button("Custom Cell Editors",
+                new Button.ClickListener() {
 
                     @Override
                     public void buttonClick(ClickEvent event) {
@@ -250,10 +257,8 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                     }
 
                 });
+        upload.setReceiver(this);
 
-        VerticalLayout checkBoxLayout = new VerticalLayout();
-        checkBoxLayout.addComponents(gridlines, rowColHeadings);
-        options.addComponent(checkBoxLayout);
         options.addComponent(newSpreadsheetButton);
         options.addComponent(newSpreadsheetInWindowButton);
         options.addComponent(customComponentTest);
@@ -271,16 +276,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 }
             }
         }));
-        options.addComponent(new Button("Reset from data",
-                new Button.ClickListener() {
 
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        if (spreadsheet != null) {
-                            spreadsheet.setWorkbook(spreadsheet.getWorkbook());
-                        }
-                    }
-                }));
         HorizontalLayout sheetOptions = new HorizontalLayout();
         sheetOptions.setSpacing(true);
         sheetOptions.addComponent(save);
@@ -295,8 +291,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             }
         });
 
-        HorizontalLayout styleOptions = new HorizontalLayout();
-
         Button boldButton = new Button(FontAwesome.BOLD);
         Button italicButton = new Button(FontAwesome.ITALIC);
         ColorPicker backgroundColor = new ColorPicker("Background Color");
@@ -306,18 +300,21 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
             @Override
             public void buttonClick(ClickEvent event) {
-                List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                for (CellReference cellRef : spreadsheet
-                        .getSelectedCellReferences()) {
-                    Cell cell = getOrCreateCell(cellRef);
-                    CellStyle style = cloneStyle(cell);
-                    Font font = cloneFont(style);
-                    font.setBold(!font.getBold());
-                    style.setFont(font);
-                    cell.setCellStyle(style);
-                    cellsToRefresh.add(cell);
+                if (spreadsheet != null) {
+                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                    for (CellReference cellRef : spreadsheet
+                            .getSelectedCellReferences()) {
+                        Cell cell = getOrCreateCell(cellRef);
+                        CellStyle style = cloneStyle(cell);
+                        Font font = cloneFont(style);
+                        font.setBold(!font.getBold());
+                        style.setFont(font);
+                        cell.setCellStyle(style);
+
+                        cellsToRefresh.add(cell);
+                    }
+                    spreadsheet.refreshCells(cellsToRefresh);
                 }
-                spreadsheet.refreshCells(cellsToRefresh);
             }
         });
 
@@ -325,18 +322,20 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
             @Override
             public void buttonClick(ClickEvent event) {
-                List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                for (CellReference cellRef : spreadsheet
-                        .getSelectedCellReferences()) {
-                    Cell cell = getOrCreateCell(cellRef);
-                    CellStyle style = cloneStyle(cell);
-                    Font font = cloneFont(style);
-                    font.setItalic(!font.getItalic());
-                    style.setFont(font);
-                    cell.setCellStyle(style);
-                    cellsToRefresh.add(cell);
+                if (spreadsheet != null) {
+                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                    for (CellReference cellRef : spreadsheet
+                            .getSelectedCellReferences()) {
+                        Cell cell = getOrCreateCell(cellRef);
+                        CellStyle style = cloneStyle(cell);
+                        Font font = cloneFont(style);
+                        font.setItalic(!font.getItalic());
+                        style.setFont(font);
+                        cell.setCellStyle(style);
+                        cellsToRefresh.add(cell);
+                    }
+                    spreadsheet.refreshCells(cellsToRefresh);
                 }
-                spreadsheet.refreshCells(cellsToRefresh);
             }
         });
 
@@ -344,36 +343,42 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
             @Override
             public void colorChanged(ColorChangeEvent event) {
-
-                List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                for (CellReference cellRef : spreadsheet
-                        .getSelectedCellReferences()) {
-                    Cell cell = getOrCreateCell(cellRef);
-                    if (spreadsheet.getWorkbook() instanceof XSSFWorkbook) {
-                        XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                        Color newColor = event.getColor();
-                        if (newColor != null) {
-                            XSSFColor color = new XSSFColor(java.awt.Color
-                                    .decode(newColor.getCSS()));
-                            style.setFillForegroundColor(color);
+                if (spreadsheet != null) {
+                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                    for (CellReference cellRef : spreadsheet
+                            .getSelectedCellReferences()) {
+                        Cell cell = getOrCreateCell(cellRef);
+                        if (spreadsheet.getWorkbook() instanceof XSSFWorkbook) {
+                            XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
+                            Color newColor = event.getColor();
+                            if (newColor != null) {
+                                XSSFColor color = new XSSFColor(java.awt.Color
+                                        .decode(newColor.getCSS()));
+                                style.setFillForegroundColor(color);
+                                cell.setCellStyle(style);
+                            }
+                        } else {
+                            CellStyle style = cloneStyle(cell);
+                            style.setFillForegroundColor(IndexedColors.GREEN
+                                    .getIndex());
                             cell.setCellStyle(style);
                         }
-                    } else {
-                        CellStyle style = cloneStyle(cell);
-                        style.setFillForegroundColor(IndexedColors.GREEN
-                                .getIndex());
-                        cell.setCellStyle(style);
+                        cellsToRefresh.add(cell);
                     }
-                    cellsToRefresh.add(cell);
+                    spreadsheet.refreshCells(cellsToRefresh);
                 }
-                spreadsheet.refreshCells(cellsToRefresh);
             }
         });
 
+        HorizontalLayout styleOptions = new HorizontalLayout();
+        styleOptions.setSpacing(true);
+        styleOptions.addComponents(gridlines, rowColHeadings);
         styleOptions.addComponent(boldButton);
         styleOptions.addComponent(italicButton);
         styleOptions.addComponent(backgroundColor);
-
+        styleOptions.setComponentAlignment(gridlines, Alignment.MIDDLE_CENTER);
+        styleOptions.setComponentAlignment(rowColHeadings,
+                Alignment.MIDDLE_CENTER);
         menuBar.addComponent(options);
         menuBar.addComponent(styleOptions);
         layout.addComponent(menuBar);
