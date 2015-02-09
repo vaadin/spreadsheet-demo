@@ -16,13 +16,17 @@ import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.apache.poi.hssf.usermodel.HSSFPalette;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
@@ -294,8 +298,11 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         Button boldButton = new Button(FontAwesome.BOLD);
         Button italicButton = new Button(FontAwesome.ITALIC);
         ColorPicker backgroundColor = new ColorPicker("Background Color");
-        backgroundColor.setIcon(FontAwesome.FONT);
+        backgroundColor.setIcon(FontAwesome.SQUARE);
         backgroundColor.setCaption("Background Color");
+        ColorPicker fontColor = new ColorPicker("Font Color");
+        fontColor.setIcon(FontAwesome.FONT);
+        fontColor.setCaption("Font Color");
         boldButton.addClickListener(new Button.ClickListener() {
 
             @Override
@@ -343,24 +350,56 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
             @Override
             public void colorChanged(ColorChangeEvent event) {
-                if (spreadsheet != null) {
+                Color newColor = event.getColor();
+                if (spreadsheet != null && newColor != null) {
                     List<Cell> cellsToRefresh = new ArrayList<Cell>();
                     for (CellReference cellRef : spreadsheet
                             .getSelectedCellReferences()) {
                         Cell cell = getOrCreateCell(cellRef);
-                        if (spreadsheet.getWorkbook() instanceof XSSFWorkbook) {
+                        Workbook workbook = spreadsheet.getWorkbook();
+                        if (workbook instanceof XSSFWorkbook) {
                             XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                            Color newColor = event.getColor();
-                            if (newColor != null) {
-                                XSSFColor color = new XSSFColor(java.awt.Color
-                                        .decode(newColor.getCSS()));
-                                style.setFillForegroundColor(color);
-                                cell.setCellStyle(style);
-                            }
+                            XSSFColor color = new XSSFColor(java.awt.Color
+                                    .decode(newColor.getCSS()));
+                            style.setFillForegroundColor(color);
+                            cell.setCellStyle(style);
                         } else {
                             CellStyle style = cloneStyle(cell);
-                            style.setFillForegroundColor(IndexedColors.GREEN
-                                    .getIndex());
+                            style.setFillForegroundColor(getSimilarColorIndex(
+                                    newColor));
+                            cell.setCellStyle(style);
+                        }
+                        cellsToRefresh.add(cell);
+                    }
+                    spreadsheet.refreshCells(cellsToRefresh);
+                }
+            }
+        });
+
+        fontColor.addColorChangeListener(new ColorChangeListener() {
+
+            @Override
+            public void colorChanged(ColorChangeEvent event) {
+                Color newColor = event.getColor();
+                if (spreadsheet != null && newColor != null) {
+                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
+                    for (CellReference cellRef : spreadsheet
+                            .getSelectedCellReferences()) {
+                        Cell cell = getOrCreateCell(cellRef);
+                        Workbook workbook = spreadsheet.getWorkbook();
+                        if (workbook instanceof XSSFWorkbook) {
+                            XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
+                            XSSFColor color = new XSSFColor(java.awt.Color
+                                    .decode(newColor.getCSS()));
+                            XSSFFont font = (XSSFFont) cloneFont(style);
+                            font.setColor(color);
+                            style.setFont(font);
+                            cell.setCellStyle(style);
+                        } else {
+                            CellStyle style = cloneStyle(cell);
+                            Font font = cloneFont(style);
+                            font.setColor(getSimilarColorIndex(newColor));
+                            style.setFont(font);
                             cell.setCellStyle(style);
                         }
                         cellsToRefresh.add(cell);
@@ -375,6 +414,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         styleOptions.addComponents(gridlines, rowColHeadings);
         styleOptions.addComponent(boldButton);
         styleOptions.addComponent(italicButton);
+        styleOptions.addComponent(fontColor);
         styleOptions.addComponent(backgroundColor);
         styleOptions.setComponentAlignment(gridlines, Alignment.MIDDLE_CENTER);
         styleOptions.setComponentAlignment(rowColHeadings,
@@ -407,14 +447,18 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         if (originalFont != null) {
             newFont.setBold(originalFont.getBold());
             newFont.setItalic(originalFont.getItalic());
-            newFont.setColor(originalFont.getColor());
             newFont.setFontHeight(originalFont.getFontHeight());
             newFont.setUnderline(originalFont.getUnderline());
             newFont.setStrikeout(originalFont.getStrikeout());
+            if (originalFont instanceof XSSFFont) {
+                XSSFFont originalXFont = (XSSFFont) originalFont;
+                XSSFFont newXFont = (XSSFFont) newFont;
+                newXFont.setColor(originalXFont.getXSSFColor());
+            } else {
+                newFont.setColor(originalFont.getColor());
+            }
         }
-
         return newFont;
-
     }
 
     protected void createNewSheet() {
@@ -441,7 +485,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
     protected void createNewSheetInWindow() {
         Spreadsheet spreadsheet = new Spreadsheet();
-
         Window w = new Window("new Spreadsheet", spreadsheet);
         w.setWidth("50%");
         w.setHeight("50%");
@@ -502,17 +545,6 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         spreadsheet.setInfoLabelValue(allSelectedCells.size()
                 + " selected cells");
 
-        // System.out.println(event.getSelectedCellReference().toString());
-        // System.out.println("Merged region: "
-        // + event.getSelectedCellMergedRegion());
-        // System.out.println("Ranges:");
-        // for (CellRangeAddress range : event.getCellRangeAddresses()) {
-        // System.out.println(range.toString());
-        // }
-        // System.out.println("Individual Cells:");
-        // for (CellReference cell : event.getIndividualSelectedCells()) {
-        // System.out.println(cell.toString());
-        // }
     }
 
     private void loadFile(File file) {
@@ -568,6 +600,14 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private short getSimilarColorIndex(Color newColor) {
+        HSSFPalette palette = ((HSSFWorkbook) spreadsheet.getWorkbook())
+                .getCustomPalette();
+        HSSFColor color = palette.findSimilarColor(newColor.getRed(),
+                newColor.getGreen(), newColor.getBlue());
+        return color.getIndex();
     }
 
 }
