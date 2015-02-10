@@ -1,6 +1,8 @@
 package com.vaadin.addon.spreadsheet.demo;
 
 import static com.vaadin.ui.themes.ValoTheme.THEME_NAME;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,13 +24,23 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.model.ChartType;
+import com.vaadin.addon.charts.model.Configuration;
+import com.vaadin.addon.charts.model.DataSeries;
+import com.vaadin.addon.charts.model.DataSeriesItem;
+import com.vaadin.addon.charts.model.Labels;
+import com.vaadin.addon.charts.model.PlotOptionsPie;
+import com.vaadin.addon.charts.model.Tooltip;
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditEvent;
 import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditListener;
@@ -100,7 +112,9 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
     private CheckBox rowColHeadings;
 
     Spreadsheet spreadsheet;
+    Chart chart;
     private SelectionChangeListener selectionChangeListener;
+    private SelectionChangeListener valueChangeListener;
     private SpreadsheetComponentFactory spreadsheetFieldFactory;
     private SelectedSheetChangeListener selectedSheetChangeListener;
     private final Handler spreadsheetActionHandler = new SpreadsheetDefaultActionHandler();
@@ -122,6 +136,14 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 printSelectionChangeEventContents(event);
+            }
+        };
+
+        valueChangeListener = new SelectionChangeListener() {
+
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                updateChartData();
             }
         };
 
@@ -187,6 +209,15 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                     @Override
                     public void buttonClick(ClickEvent event) {
                         createNewSheet();
+                    }
+                });
+
+        Button newSpreadsheetWithChartButton = new Button(
+                "New Spreadsheet with chart", new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(ClickEvent event) {
+                        createNewSheetWithChart();
                     }
                 });
 
@@ -264,6 +295,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         upload.setReceiver(this);
 
         options.addComponent(newSpreadsheetButton);
+        options.addComponent(newSpreadsheetWithChartButton);
         options.addComponent(newSpreadsheetInWindowButton);
         options.addComponent(customComponentTest);
         options.addComponent(openTestSheetSelect);
@@ -365,8 +397,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                             cell.setCellStyle(style);
                         } else {
                             CellStyle style = cloneStyle(cell);
-                            style.setFillForegroundColor(getSimilarColorIndex(
-                                    newColor));
+                            style.setFillForegroundColor(getSimilarColorIndex(newColor));
                             cell.setCellStyle(style);
                         }
                         cellsToRefresh.add(cell);
@@ -461,6 +492,87 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         return newFont;
     }
 
+    protected void createNewSheetWithChart() {
+        createNewSheet();
+
+        spreadsheet.addSelectionChangeListener(valueChangeListener);
+        spreadsheet.createCell(0, 0,
+                "Edit this spreadsheet to alter chart title and data");
+        spreadsheet.createCell(1, 0, "This is chart title");
+        spreadsheet.createCell(2, 0, "Category");
+        spreadsheet.createCell(2, 1, "Amount");
+        spreadsheet.createCell(3, 0, "Brand 1");
+        spreadsheet.createCell(3, 1, 90d);
+        spreadsheet.createCell(4, 0, "Brand 2");
+        spreadsheet.createCell(4, 1, 7d);
+        spreadsheet.createCell(5, 0, "Brand 3");
+        spreadsheet.createCell(5, 1, 3d);
+        spreadsheet.setColumnWidth(0, 130);
+        Sheet currentSheet = spreadsheet.getActiveSheet();
+        currentSheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 1));
+        currentSheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
+        chart = new Chart(ChartType.PIE);
+        Configuration conf = chart.getConfiguration();
+        PlotOptionsPie plotOptions = new PlotOptionsPie();
+        plotOptions.setTooltip(new Tooltip());
+        plotOptions.getTooltip().setEnabled(false);
+        plotOptions.setAnimation(false);
+        Labels dataLabels = new Labels();
+        dataLabels.setEnabled(true);
+        dataLabels
+                .setFormatter("''+ this.point.name +': '+ this.percentage.toFixed(2) +' %'");
+        plotOptions.setDataLabels(dataLabels);
+        conf.setPlotOptions(plotOptions);
+
+        updateChartData();
+        layout.addComponent(chart);
+        layout.setExpandRatio(chart, 1.0f);
+
+    }
+
+    private void updateChartData() {
+        int rowIndex = 3;
+        Configuration conf = chart.getConfiguration();
+        String oldTitle = conf.getTitle().getText();
+        String newTitle = getStringValue(1, 0);
+        conf.setTitle(newTitle);
+        DataSeries oldSeries = null;
+        if (!conf.getSeries().isEmpty()) {
+            oldSeries = (DataSeries) conf.getSeries().get(0);
+        }
+        DataSeries series = new DataSeries();
+        while (!isEmpty(getStringValue(rowIndex, 0))) {
+            series.add(new DataSeriesItem(getStringValue(rowIndex, 0),
+                    getNumericValue(rowIndex, 1)));
+            rowIndex++;
+        }
+        if (oldSeries == null
+                || !series.toString().equals(oldSeries.toString())
+                || !newTitle.equals(oldTitle)) {
+            conf.setSeries(series);
+            chart.drawChart();
+        }
+    }
+
+    private String getStringValue(int rowIndex, int columnIndex) {
+        Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
+        if (cell != null) {
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            return cell.getStringCellValue();
+        }
+        return null;
+    }
+
+    private Double getNumericValue(int rowIndex, int columnIndex) {
+        Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
+        if (cell != null
+                && (cell.getCellType() == CELL_TYPE_NUMERIC || cell
+                        .getCachedFormulaResultType() == CELL_TYPE_NUMERIC)) {
+            return cell.getNumericCellValue();
+        }
+        return 0d;
+    }
+
     protected void createNewSheet() {
         if (spreadsheet == null) {
             spreadsheet = new Spreadsheet();
@@ -473,6 +585,11 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
             layout.setExpandRatio(spreadsheet, 1.0f);
         } else {
             spreadsheet.reset();
+        }
+        if (chart != null) {
+            layout.removeComponent(chart);
+            spreadsheet.removeSelectionChangeListener(valueChangeListener);
+            chart = null;
         }
         spreadsheet.setSpreadsheetComponentFactory(null);
         save.setEnabled(true);
