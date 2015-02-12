@@ -2,6 +2,7 @@ package com.vaadin.addon.spreadsheet.demo;
 
 import static com.vaadin.ui.themes.ValoTheme.THEME_NAME;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 
 import java.io.File;
@@ -101,7 +102,9 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
 
     VerticalLayout layout = new VerticalLayout();
 
-    Upload upload = new Upload();
+    // Disabled by default for the public demo
+    private boolean showUploadComponent = false;
+    private Upload upload = new Upload();
     private File previousFile = null;
 
     private Button save;
@@ -299,7 +302,10 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         options.addComponent(newSpreadsheetInWindowButton);
         options.addComponent(customComponentTest);
         options.addComponent(openTestSheetSelect);
-        options.addComponent(upload);
+        if (showUploadComponent) {
+            options.addComponent(upload);
+        }
+
         options.addComponent(new Button("Close", new Button.ClickListener() {
 
             @Override
@@ -309,6 +315,10 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                     layout.removeComponent(spreadsheet);
                     spreadsheet = null;
                     SpreadsheetFactory.logMemoryUsage();
+                }
+                if (chart != null) {
+                    layout.removeComponent(chart);
+                    chart = null;
                 }
             }
         }));
@@ -512,6 +522,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         currentSheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 1));
         currentSheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
         chart = new Chart(ChartType.PIE);
+        chart.setSizeFull();
         Configuration conf = chart.getConfiguration();
         PlotOptionsPie plotOptions = new PlotOptionsPie();
         plotOptions.setTooltip(new Tooltip());
@@ -566,8 +577,9 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
     private Double getNumericValue(int rowIndex, int columnIndex) {
         Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
         if (cell != null
-                && (cell.getCellType() == CELL_TYPE_NUMERIC || cell
-                        .getCachedFormulaResultType() == CELL_TYPE_NUMERIC)) {
+                && (cell.getCellType() == CELL_TYPE_NUMERIC || (cell
+                        .getCellType() == CELL_TYPE_FORMULA && cell
+                        .getCachedFormulaResultType() == CELL_TYPE_NUMERIC))) {
             return cell.getNumericCellValue();
         }
         return 0d;
@@ -651,6 +663,11 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                             .getTestWorkbook());
             spreadsheet.setSpreadsheetComponentFactory(spreadsheetFieldFactory);
         }
+        if (chart != null) {
+            layout.removeComponent(chart);
+            spreadsheet.removeSelectionChangeListener(valueChangeListener);
+            chart = null;
+        }
 
         gridlines.setValue(spreadsheet.isGridlinesVisible());
         rowColHeadings.setValue(spreadsheet.isRowColHeadingsVisible());
@@ -689,6 +706,11 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                                 file.getAbsolutePath())) {
                     spreadsheet.read(file);
                 }
+            }
+            if (chart != null) {
+                layout.removeComponent(chart);
+                spreadsheet.removeSelectionChangeListener(valueChangeListener);
+                chart = null;
             }
             spreadsheet.setSpreadsheetComponentFactory(null);
             previousFile = file;
