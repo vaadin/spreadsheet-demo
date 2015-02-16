@@ -110,3 +110,6 @@ local.properties
 .project
 
 .DS_Store
+
+src/main/webapp/VAADIN/widgetsets/
+src/main/webapp/VAADIN/themes/demo-theme/styles.scss.cache

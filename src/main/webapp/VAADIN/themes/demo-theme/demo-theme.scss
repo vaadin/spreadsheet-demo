@@ -1,0 +1,60 @@
+
+$menu-background-color: #38414A;
+
+$v-link-font-color: #59ACFF;
+$v-link-text-decoration: none;
+$v-bevel: false;
+$v-shadow: false;
+$v-gradient: false;
+
+@import "../valo/valo.scss";
+
+@mixin demo-theme {
+  @include valo;
+
+  // Include SplitPanel styles manually (avoid any excess output and also modify the splitter size)
+  @include valo-splitpanel-global;
+
+  .v-splitpanel-horizontal {
+    @include valo-splitpanel-style($orientation: horizontal, $splitter-size: 0);
+  }
+
+  .v-splitpanel-first-container-main-layout {
+    @include linear-gradient(to left, darken($menu-background-color, 5%) 0, $menu-background-color 9px);
+    color: valo-font-color($menu-background-color);
+  }
+
+  .v-splitpanel-second-container-main-layout {
+  }
+
+  .links {
+    position: absolute;
+    bottom: 8px;
+    left: 0px;
+    text-align: center;
+    width: 300px;
+  }
+
+  .link {
+    color: #c5cacf;
+  }
+
+  .linkIcon {
+    font-size: 32px;
+    color: #c5cacf;
+  }
+
+  .logo {
+    color: valo-font-color($menu-background-color, 1);
+    font-weight: $v-font-weight + 100;
+    text-align: center;
+    background: transparent url("vaadin-spreadsheet-icon.png") no-repeat 50% -15px;
+    background-size: 148px 144px;
+    padding-top: 120px;
+    margin-bottom: 4px;
+
+    .v-ie8 & {
+      background-image: url("vaadin-spreadsheet-icon.png");
+    }
+  }
+}

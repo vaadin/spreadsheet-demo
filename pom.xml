@@ -68,11 +68,11 @@
 			<artifactId>vaadin-spreadsheet</artifactId>
 			<version>${spreadsheet.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.vaadin.addon</groupId>
-            <artifactId>vaadin-charts</artifactId>
-            <version>${vaadin.charts.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>com.vaadin.addon</groupId>
+			<artifactId>vaadin-charts</artifactId>
+			<version>${vaadin.charts.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-push</artifactId>
@@ -93,6 +93,11 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.8</version>
 		</dependency>
 	</dependencies>
 

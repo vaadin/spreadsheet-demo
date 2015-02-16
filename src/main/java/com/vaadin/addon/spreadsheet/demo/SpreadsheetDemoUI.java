@@ -1,86 +1,45 @@
 package com.vaadin.addon.spreadsheet.demo;
 
-import static com.vaadin.ui.themes.ValoTheme.THEME_NAME;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
+import static com.vaadin.ui.Alignment.MIDDLE_CENTER;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 
-import org.apache.poi.hssf.usermodel.HSSFPalette;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.reflections.Reflections;
 
-import com.vaadin.addon.charts.Chart;
-import com.vaadin.addon.charts.model.ChartType;
-import com.vaadin.addon.charts.model.Configuration;
-import com.vaadin.addon.charts.model.DataSeries;
-import com.vaadin.addon.charts.model.DataSeriesItem;
-import com.vaadin.addon.charts.model.Labels;
-import com.vaadin.addon.charts.model.PlotOptionsPie;
-import com.vaadin.addon.charts.model.Tooltip;
 import com.vaadin.addon.spreadsheet.Spreadsheet;
-import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditEvent;
-import com.vaadin.addon.spreadsheet.Spreadsheet.ProtectedEditListener;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectedSheetChangeEvent;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectedSheetChangeListener;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeEvent;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeListener;
-import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
 import com.vaadin.addon.spreadsheet.SpreadsheetFactory;
-import com.vaadin.addon.spreadsheet.action.SpreadsheetDefaultActionHandler;
+import com.vaadin.addon.spreadsheet.demo.examples.SkipFromDemo;
+import com.vaadin.addon.spreadsheet.demo.examples.SpreadsheetExample;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.Container;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.FilesystemContainer;
-import com.vaadin.event.Action.Handler;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.FileResource;
+import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.ui.colorpicker.Color;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ColorPicker;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
+import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
-import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.Upload.SucceededEvent;
-import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
-import com.vaadin.ui.components.colorpicker.ColorChangeListener;
 
 /**
  * Demo class for the Spreadsheet component.
@@ -91,148 +50,79 @@ import com.vaadin.ui.components.colorpicker.ColorChangeListener;
  * 
  * 
  */
-@SuppressWarnings("serial")
-@Theme(THEME_NAME)
-public class SpreadsheetDemoUI extends UI implements Receiver {
+@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@Theme("demo-theme")
+@Title("Vaadin Spreadsheet Demo")
+public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = SpreadsheetDemoUI.class, widgetset = "com.vaadin.addon.spreadsheet.demo.DemoWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
-    VerticalLayout layout = new VerticalLayout();
-
-    // Disabled by default for the public demo
-    private boolean showUploadComponent = false;
-    private Upload upload = new Upload();
-    private File previousFile = null;
-
-    private Button save;
-    private Button download;
-    private File uploadedFile;
-    private ComboBox openTestSheetSelect;
-    private CheckBox gridlines;
-    private CheckBox rowColHeadings;
-
-    Spreadsheet spreadsheet;
-    Chart chart;
-    private SelectionChangeListener selectionChangeListener;
-    private SelectionChangeListener valueChangeListener;
-    private SpreadsheetComponentFactory spreadsheetFieldFactory;
-    private SelectedSheetChangeListener selectedSheetChangeListener;
-    private final Handler spreadsheetActionHandler = new SpreadsheetDefaultActionHandler();
+    private Tree tree;
+    private HorizontalSplitPanel horizontalSplitPanel;
+    private HorizontalLayout links;
 
     public SpreadsheetDemoUI() {
         super();
+        setSizeFull();
         SpreadsheetFactory.logMemoryUsage();
     }
 
     @Override
     protected void init(VaadinRequest request) {
-        SpreadsheetFactory.logMemoryUsage();
-        setContent(layout);
 
-        buildOptions();
+        horizontalSplitPanel = new HorizontalSplitPanel();
+        horizontalSplitPanel.setSplitPosition(300, Unit.PIXELS);
+        horizontalSplitPanel.addStyleName("main-layout");
 
-        selectionChangeListener = new SelectionChangeListener() {
+        links = new HorizontalLayout();
+        links.setSpacing(true);
+        links.addStyleName("links");
 
-            @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                printSelectionChangeEventContents(event);
+        setContent(new CssLayout() {
+            {
+                setSizeFull();
+                addComponent(horizontalSplitPanel);
+                addComponent(links);
             }
-        };
+        });
 
-        valueChangeListener = new SelectionChangeListener() {
+        Link github = new Link("Source code on Github", new ExternalResource(
+                "https://github.com/vaadin/spreadsheet-demo"));
+        github.addStyleName("link");
 
-            @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                updateChartData();
-            }
-        };
+        Link githubIcon = new Link("", new ExternalResource(
+                "https://github.com/vaadin/spreadsheet-demo"));
+        githubIcon.addStyleName("linkIcon");
 
-        selectedSheetChangeListener = new SelectedSheetChangeListener() {
+        githubIcon.setIcon(FontAwesome.GITHUB);
+        links.addComponents(githubIcon, github);
+        links.setComponentAlignment(github, MIDDLE_CENTER);
 
-            @Override
-            public void onSelectedSheetChange(SelectedSheetChangeEvent event) {
-                gridlines.setValue(event.getNewSheet().isDisplayGridlines());
-                rowColHeadings.setValue(event.getNewSheet()
-                        .isDisplayRowColHeadings());
-            }
-        };
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        content.setMargin(new MarginInfo(false, false, true, false));
 
-        spreadsheetFieldFactory = new TestComponentFactory();
+        Label logo = new Label("Vaadin Spreadsheet");
+        logo.addStyleName("h3");
+        logo.addStyleName("logo");
+
+        tree = new Tree();
+        tree.setImmediate(true);
+        tree.setContainerDataSource(getContainer());
+        tree.setItemCaptionPropertyId("displayName");
+        tree.setNullSelectionAllowed(false);
+        tree.setWidth("100%");
+        tree.addValueChangeListener(this);
+
+        content.addComponents(logo, tree);
+        horizontalSplitPanel.setFirstComponent(content);
 
     }
 
-    private void buildOptions() {
-        VerticalLayout menuBar = new VerticalLayout();
-        menuBar.setSpacing(true);
-
-        HorizontalLayout options = new HorizontalLayout();
-        options.setSpacing(true);
-
-        layout.setMargin(true);
-        layout.setSpacing(true);
-
-        layout.setSizeFull();
-
-        gridlines = new CheckBox("grid lines");
-        gridlines.setImmediate(true);
-
-        rowColHeadings = new CheckBox("headers");
-        rowColHeadings.setImmediate(true);
-
-        gridlines.addValueChangeListener(new ValueChangeListener() {
-
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                Boolean display = (Boolean) event.getProperty().getValue();
-
-                if (spreadsheet != null) {
-                    spreadsheet.setGridlinesVisible(display);
-                }
-            }
-        });
-
-        rowColHeadings.addValueChangeListener(new ValueChangeListener() {
-
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                Boolean display = (Boolean) event.getProperty().getValue();
-
-                if (spreadsheet != null) {
-                    spreadsheet.setRowColHeadingsVisible(display);
-                }
-            }
-        });
-
-        Button newSpreadsheetButton = new Button("New Spreadsheet",
-                new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        createNewSheet();
-                    }
-                });
-
-        Button newSpreadsheetWithChartButton = new Button(
-                "New Spreadsheet with chart", new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        createNewSheetWithChart();
-                    }
-                });
-
-        Button newSpreadsheetInWindowButton = new Button("New in Window",
-                new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        createNewSheetInWindow();
-                    }
-                });
-
+    private Container getContainer() {
         File root = null;
         try {
             ClassLoader classLoader = SpreadsheetDemoUI.class.getClassLoader();
@@ -244,6 +134,7 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+
         FilesystemContainer testSheetContainer = new FilesystemContainer(root);
         testSheetContainer.setRecursive(false);
         testSheetContainer.setFilter(new FilenameFilter() {
@@ -258,495 +149,90 @@ public class SpreadsheetDemoUI extends UI implements Receiver {
                 }
             }
         });
-        openTestSheetSelect = new ComboBox(null, testSheetContainer);
-        openTestSheetSelect.setPageLength(0);
-        openTestSheetSelect.setImmediate(true);
-        openTestSheetSelect.setItemCaptionPropertyId("Name");
-        openTestSheetSelect.setItemIconPropertyId("Icon");
-        openTestSheetSelect.addValueChangeListener(new ValueChangeListener() {
 
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                Object value = openTestSheetSelect.getValue();
-                if (value instanceof File) {
-                    loadFile((File) value);
-                }
+        HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
+        hierarchicalContainer.addContainerProperty("displayName", String.class,
+                "");
+
+        Item groupItem = hierarchicalContainer.addItem("sampleFiles");
+        groupItem.getItemProperty("displayName").setValue("MS Excel Support");
+        for (File file : testSheetContainer.getItemIds()) {
+            Item fileItem = hierarchicalContainer.addItem(file);
+            fileItem.getItemProperty("displayName").setValue(file.getName());
+            hierarchicalContainer.setParent(file, "sampleFiles");
+            hierarchicalContainer.setChildrenAllowed(file, false);
+        }
+
+        Reflections reflections = new Reflections(
+                "com.vaadin.addon.spreadsheet.demo.examples");
+
+        Set<Class<? extends SpreadsheetExample>> subTypes = reflections
+                .getSubTypesOf(SpreadsheetExample.class);
+        for (Class<? extends SpreadsheetExample> class1 : subTypes) {
+            if (class1.getAnnotation(SkipFromDemo.class) != null) {
+                continue;
             }
-        });
-        save = new Button("Save", new Button.ClickListener() {
+            groupItem = hierarchicalContainer.addItem(class1);
+            groupItem.getItemProperty("displayName").setValue(
+                    splitCamelCase(class1.getSimpleName()));
+            hierarchicalContainer.setChildrenAllowed(class1, false);
 
-            @Override
-            public void buttonClick(ClickEvent event) {
-                if (spreadsheet != null) {
-                    saveFile();
-                }
-            }
-        });
-        save.setEnabled(false);
-        download = new Button("Download");
-        download.setEnabled(false);
-
-        Button customComponentTest = new Button("Custom Cell Editors",
-                new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        createEditorTestSheet();
-                    }
-
-                });
-        upload.setReceiver(this);
-
-        options.addComponent(newSpreadsheetButton);
-        options.addComponent(newSpreadsheetWithChartButton);
-        options.addComponent(newSpreadsheetInWindowButton);
-        options.addComponent(customComponentTest);
-        options.addComponent(openTestSheetSelect);
-        if (showUploadComponent) {
-            options.addComponent(upload);
         }
-
-        options.addComponent(new Button("Close", new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                if (spreadsheet != null) {
-                    SpreadsheetFactory.logMemoryUsage();
-                    layout.removeComponent(spreadsheet);
-                    spreadsheet = null;
-                    SpreadsheetFactory.logMemoryUsage();
-                }
-                if (chart != null) {
-                    layout.removeComponent(chart);
-                    chart = null;
-                }
-            }
-        }));
-
-        HorizontalLayout sheetOptions = new HorizontalLayout();
-        sheetOptions.setSpacing(true);
-        sheetOptions.addComponent(save);
-        sheetOptions.addComponent(download);
-
-        upload.setImmediate(true);
-        upload.addSucceededListener(new SucceededListener() {
-
-            @Override
-            public void uploadSucceeded(SucceededEvent event) {
-                loadFile(uploadedFile);
-            }
-        });
-
-        Button boldButton = new Button(FontAwesome.BOLD);
-        Button italicButton = new Button(FontAwesome.ITALIC);
-        ColorPicker backgroundColor = new ColorPicker("Background Color");
-        backgroundColor.setIcon(FontAwesome.SQUARE);
-        backgroundColor.setCaption("Background Color");
-        ColorPicker fontColor = new ColorPicker("Font Color");
-        fontColor.setIcon(FontAwesome.FONT);
-        fontColor.setCaption("Font Color");
-        boldButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                if (spreadsheet != null) {
-                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                    for (CellReference cellRef : spreadsheet
-                            .getSelectedCellReferences()) {
-                        Cell cell = getOrCreateCell(cellRef);
-                        CellStyle style = cloneStyle(cell);
-                        Font font = cloneFont(style);
-                        font.setBold(!font.getBold());
-                        style.setFont(font);
-                        cell.setCellStyle(style);
-
-                        cellsToRefresh.add(cell);
-                    }
-                    spreadsheet.refreshCells(cellsToRefresh);
-                }
-            }
-        });
-
-        italicButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                if (spreadsheet != null) {
-                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                    for (CellReference cellRef : spreadsheet
-                            .getSelectedCellReferences()) {
-                        Cell cell = getOrCreateCell(cellRef);
-                        CellStyle style = cloneStyle(cell);
-                        Font font = cloneFont(style);
-                        font.setItalic(!font.getItalic());
-                        style.setFont(font);
-                        cell.setCellStyle(style);
-                        cellsToRefresh.add(cell);
-                    }
-                    spreadsheet.refreshCells(cellsToRefresh);
-                }
-            }
-        });
-
-        backgroundColor.addColorChangeListener(new ColorChangeListener() {
-
-            @Override
-            public void colorChanged(ColorChangeEvent event) {
-                Color newColor = event.getColor();
-                if (spreadsheet != null && newColor != null) {
-                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                    for (CellReference cellRef : spreadsheet
-                            .getSelectedCellReferences()) {
-                        Cell cell = getOrCreateCell(cellRef);
-                        Workbook workbook = spreadsheet.getWorkbook();
-                        if (workbook instanceof XSSFWorkbook) {
-                            XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                            XSSFColor color = new XSSFColor(java.awt.Color
-                                    .decode(newColor.getCSS()));
-                            style.setFillForegroundColor(color);
-                            cell.setCellStyle(style);
-                        } else {
-                            CellStyle style = cloneStyle(cell);
-                            style.setFillForegroundColor(getSimilarColorIndex(newColor));
-                            cell.setCellStyle(style);
-                        }
-                        cellsToRefresh.add(cell);
-                    }
-                    spreadsheet.refreshCells(cellsToRefresh);
-                }
-            }
-        });
-
-        fontColor.addColorChangeListener(new ColorChangeListener() {
-
-            @Override
-            public void colorChanged(ColorChangeEvent event) {
-                Color newColor = event.getColor();
-                if (spreadsheet != null && newColor != null) {
-                    List<Cell> cellsToRefresh = new ArrayList<Cell>();
-                    for (CellReference cellRef : spreadsheet
-                            .getSelectedCellReferences()) {
-                        Cell cell = getOrCreateCell(cellRef);
-                        Workbook workbook = spreadsheet.getWorkbook();
-                        if (workbook instanceof XSSFWorkbook) {
-                            XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                            XSSFColor color = new XSSFColor(java.awt.Color
-                                    .decode(newColor.getCSS()));
-                            XSSFFont font = (XSSFFont) cloneFont(style);
-                            font.setColor(color);
-                            style.setFont(font);
-                            cell.setCellStyle(style);
-                        } else {
-                            CellStyle style = cloneStyle(cell);
-                            Font font = cloneFont(style);
-                            font.setColor(getSimilarColorIndex(newColor));
-                            style.setFont(font);
-                            cell.setCellStyle(style);
-                        }
-                        cellsToRefresh.add(cell);
-                    }
-                    spreadsheet.refreshCells(cellsToRefresh);
-                }
-            }
-        });
-
-        HorizontalLayout styleOptions = new HorizontalLayout();
-        styleOptions.setSpacing(true);
-        styleOptions.addComponents(gridlines, rowColHeadings);
-        styleOptions.addComponent(boldButton);
-        styleOptions.addComponent(italicButton);
-        styleOptions.addComponent(fontColor);
-        styleOptions.addComponent(backgroundColor);
-        styleOptions.setComponentAlignment(gridlines, Alignment.MIDDLE_CENTER);
-        styleOptions.setComponentAlignment(rowColHeadings,
-                Alignment.MIDDLE_CENTER);
-        menuBar.addComponent(options);
-        menuBar.addComponent(styleOptions);
-        layout.addComponent(menuBar);
-
+        return hierarchicalContainer;
     }
 
-    private Cell getOrCreateCell(CellReference cellRef) {
-        Cell cell = spreadsheet.getCell(cellRef.getRow(), cellRef.getCol());
-        if (cell == null) {
-            cell = spreadsheet.createCell(cellRef.getRow(), cellRef.getCol(),
-                    "");
-        }
-        return cell;
-    }
-
-    private CellStyle cloneStyle(Cell cell) {
-        CellStyle style = spreadsheet.getWorkbook().createCellStyle();
-        style.cloneStyleFrom(cell.getCellStyle());
-        return style;
-    }
-
-    private Font cloneFont(CellStyle cellstyle) {
-        Font newFont = spreadsheet.getWorkbook().createFont();
-        Font originalFont = spreadsheet.getWorkbook().getFontAt(
-                cellstyle.getFontIndex());
-        if (originalFont != null) {
-            newFont.setBold(originalFont.getBold());
-            newFont.setItalic(originalFont.getItalic());
-            newFont.setFontHeight(originalFont.getFontHeight());
-            newFont.setUnderline(originalFont.getUnderline());
-            newFont.setStrikeout(originalFont.getStrikeout());
-            if (originalFont instanceof XSSFFont) {
-                XSSFFont originalXFont = (XSSFFont) originalFont;
-                XSSFFont newXFont = (XSSFFont) newFont;
-                newXFont.setColor(originalXFont.getXSSFColor());
-            } else {
-                newFont.setColor(originalFont.getColor());
-            }
-        }
-        return newFont;
-    }
-
-    protected void createNewSheetWithChart() {
-        createNewSheet();
-
-        spreadsheet.addSelectionChangeListener(valueChangeListener);
-        spreadsheet.createCell(0, 0,
-                "Edit this spreadsheet to alter chart title and data");
-        spreadsheet.createCell(1, 0, "This is chart title");
-        spreadsheet.createCell(2, 0, "Category");
-        spreadsheet.createCell(2, 1, "Amount");
-        spreadsheet.createCell(3, 0, "Brand 1");
-        spreadsheet.createCell(3, 1, 90d);
-        spreadsheet.createCell(4, 0, "Brand 2");
-        spreadsheet.createCell(4, 1, 7d);
-        spreadsheet.createCell(5, 0, "Brand 3");
-        spreadsheet.createCell(5, 1, 3d);
-        spreadsheet.setColumnWidth(0, 130);
-        Sheet currentSheet = spreadsheet.getActiveSheet();
-        currentSheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 1));
-        currentSheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
-        chart = new Chart(ChartType.PIE);
-        chart.setSizeFull();
-        Configuration conf = chart.getConfiguration();
-        PlotOptionsPie plotOptions = new PlotOptionsPie();
-        plotOptions.setTooltip(new Tooltip());
-        plotOptions.getTooltip().setEnabled(false);
-        plotOptions.setAnimation(false);
-        Labels dataLabels = new Labels();
-        dataLabels.setEnabled(true);
-        dataLabels
-                .setFormatter("''+ this.point.name +': '+ this.percentage.toFixed(2) +' %'");
-        plotOptions.setDataLabels(dataLabels);
-        conf.setPlotOptions(plotOptions);
-
-        updateChartData();
-        layout.addComponent(chart);
-        layout.setExpandRatio(chart, 1.0f);
-
-    }
-
-    private void updateChartData() {
-        int rowIndex = 3;
-        Configuration conf = chart.getConfiguration();
-        String oldTitle = conf.getTitle().getText();
-        String newTitle = getStringValue(1, 0);
-        conf.setTitle(newTitle);
-        DataSeries oldSeries = null;
-        if (!conf.getSeries().isEmpty()) {
-            oldSeries = (DataSeries) conf.getSeries().get(0);
-        }
-        DataSeries series = new DataSeries();
-        while (!isEmpty(getStringValue(rowIndex, 0))) {
-            series.add(new DataSeriesItem(getStringValue(rowIndex, 0),
-                    getNumericValue(rowIndex, 1)));
-            rowIndex++;
-        }
-        if (oldSeries == null
-                || !series.toString().equals(oldSeries.toString())
-                || !newTitle.equals(oldTitle)) {
-            conf.setSeries(series);
-            chart.drawChart();
-        }
-    }
-
-    private String getStringValue(int rowIndex, int columnIndex) {
-        Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
-        if (cell != null) {
-            cell.setCellType(Cell.CELL_TYPE_STRING);
-            return cell.getStringCellValue();
-        }
-        return null;
-    }
-
-    private Double getNumericValue(int rowIndex, int columnIndex) {
-        Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
-        if (cell != null
-                && (cell.getCellType() == CELL_TYPE_NUMERIC || (cell
-                        .getCellType() == CELL_TYPE_FORMULA && cell
-                        .getCachedFormulaResultType() == CELL_TYPE_NUMERIC))) {
-            return cell.getNumericCellValue();
-        }
-        return 0d;
-    }
-
-    protected void createNewSheet() {
-        if (spreadsheet == null) {
-            spreadsheet = new Spreadsheet();
-            spreadsheet.addSelectionChangeListener(selectionChangeListener);
-            spreadsheet
-                    .addSelectedSheetChangeListener(selectedSheetChangeListener);
-            spreadsheet.addActionHandler(spreadsheetActionHandler);
-
-            layout.addComponent(spreadsheet);
-            layout.setExpandRatio(spreadsheet, 1.0f);
-        } else {
-            spreadsheet.reset();
-        }
-        if (chart != null) {
-            layout.removeComponent(chart);
-            spreadsheet.removeSelectionChangeListener(valueChangeListener);
-            chart = null;
-        }
-        spreadsheet.setSpreadsheetComponentFactory(null);
-        save.setEnabled(true);
-        previousFile = null;
-        openTestSheetSelect.setValue(null);
-
-        gridlines.setValue(spreadsheet.isGridlinesVisible());
-        rowColHeadings.setValue(spreadsheet.isRowColHeadingsVisible());
-    }
-
-    protected void createNewSheetInWindow() {
-        Spreadsheet spreadsheet = new Spreadsheet();
-        Window w = new Window("new Spreadsheet", spreadsheet);
-        w.setWidth("50%");
-        w.setHeight("50%");
-        w.center();
-        w.setModal(true);
-
-        addWindow(w);
-    }
-
-    protected void saveFile() {
-        try {
-            if (previousFile != null) {
-                int i = previousFile.getName().lastIndexOf(".xls");
-                String fileName = previousFile.getName().substring(0, i)
-                        + ("(1)") + previousFile.getName().substring(i);
-                previousFile = spreadsheet.write(fileName);
-            } else {
-                previousFile = spreadsheet.write("workbook1");
-            }
-            download.setEnabled(true);
-            FileResource resource = new FileResource(previousFile);
-            FileDownloader fileDownloader = new FileDownloader(resource);
-            fileDownloader.extend(download);
-            previousFile.deleteOnExit();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    protected void createEditorTestSheet() {
-        if (spreadsheet == null) {
-            spreadsheet = new Spreadsheet(
-                    ((TestComponentFactory) spreadsheetFieldFactory)
-                            .getTestWorkbook());
-            spreadsheet.setSpreadsheetComponentFactory(spreadsheetFieldFactory);
-            spreadsheet.addActionHandler(spreadsheetActionHandler);
-            layout.addComponent(spreadsheet);
-
-            layout.setExpandRatio(spreadsheet, 1.0f);
-        } else {
-            spreadsheet
-                    .setWorkbook(((TestComponentFactory) spreadsheetFieldFactory)
-                            .getTestWorkbook());
-            spreadsheet.setSpreadsheetComponentFactory(spreadsheetFieldFactory);
-        }
-        if (chart != null) {
-            layout.removeComponent(chart);
-            spreadsheet.removeSelectionChangeListener(valueChangeListener);
-            chart = null;
-        }
-
-        gridlines.setValue(spreadsheet.isGridlinesVisible());
-        rowColHeadings.setValue(spreadsheet.isRowColHeadingsVisible());
-    }
-
-    private void printSelectionChangeEventContents(SelectionChangeEvent event) {
-
-        Set<CellReference> allSelectedCells = event.getAllSelectedCells();
-        spreadsheet.setInfoLabelValue(allSelectedCells.size()
-                + " selected cells");
-
-    }
-
-    private void loadFile(File file) {
-        try {
-            if (spreadsheet == null) {
-                spreadsheet = new Spreadsheet(file);
-                spreadsheet.addSelectionChangeListener(selectionChangeListener);
-                spreadsheet
-                        .addSelectedSheetChangeListener(selectedSheetChangeListener);
-                spreadsheet.addActionHandler(spreadsheetActionHandler);
-                spreadsheet
-                        .addProtectedEditListener(new ProtectedEditListener() {
-
-                            @Override
-                            public void writeAttempted(ProtectedEditEvent event) {
-                                Notification
-                                        .show("This cell is protected and cannot be changed");
-                            }
-                        });
-                layout.addComponent(spreadsheet);
-                layout.setExpandRatio(spreadsheet, 1.0f);
-            } else {
-                if (previousFile == null
-                        || !previousFile.getAbsolutePath().equals(
-                                file.getAbsolutePath())) {
-                    spreadsheet.read(file);
-                }
-            }
-            if (chart != null) {
-                layout.removeComponent(chart);
-                spreadsheet.removeSelectionChangeListener(valueChangeListener);
-                chart = null;
-            }
-            spreadsheet.setSpreadsheetComponentFactory(null);
-            previousFile = file;
-            save.setEnabled(true);
-            download.setEnabled(false);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    static String splitCamelCase(String s) {
+        String replaced = s.replaceAll(String.format("%s|%s|%s",
+                "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])",
+                "(?<=[A-Za-z])(?=[^A-Za-z])"), " ");
+        replaced = replaced.replaceAll("Example", "");
+        return replaced.trim();
     }
 
     @Override
-    public OutputStream receiveUpload(final String filename, String mimeType) {
+    public void valueChange(ValueChangeEvent event) {
+        Object value = event.getProperty().getValue();
+        if (value instanceof File || value instanceof Class) {
+            open(value);
+        } else {
+            tree.expandItemsRecursively(value);
+            if (tree.hasChildren(value)) {
+                Object firstChild = tree.getChildren(value).iterator().next();
+                open(firstChild);
+                tree.setValue(firstChild);
+            }
+        }
+    }
 
+    private void open(Object value) {
+        if (value instanceof File) {
+            openFile((File) value);
+        } else if (value instanceof Class) {
+            openExample((Class) value);
+        }
+    }
+
+    private void openExample(Class value) {
         try {
-            File file = new File(filename);
-            file.deleteOnExit();
-            uploadedFile = file;
-            FileOutputStream fos = new FileOutputStream(uploadedFile);
-            return fos;
+            SpreadsheetExample example = (SpreadsheetExample) value
+                    .newInstance();
+            horizontalSplitPanel.setSecondComponent(example.getComponent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openFile(File file) {
+        try {
+            Spreadsheet spreadsheet = new Spreadsheet(file);
+            horizontalSplitPanel.setSecondComponent(spreadsheet);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return null;
-    }
-
-    private short getSimilarColorIndex(Color newColor) {
-        HSSFPalette palette = ((HSSFWorkbook) spreadsheet.getWorkbook())
-                .getCustomPalette();
-        HSSFColor color = palette.findSimilarColor(newColor.getRed(),
-                newColor.getGreen(), newColor.getBlue());
-        return color.getIndex();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.vaadin.addon.spreadsheet.demo;
+package com.vaadin.addon.spreadsheet.demo.examples;
 
 import java.text.Format;
 import java.util.Calendar;
@@ -29,7 +29,6 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 public class TestComponentFactory implements SpreadsheetComponentFactory {
@@ -69,6 +68,8 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
     private NativeSelect nativeSelect;
 
     private ComboBox comboBox2;
+
+    private ComponentsExample componentsExample;
 
     public TestComponentFactory() {
         testWorkbook = new XSSFWorkbook();
@@ -207,6 +208,11 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 }
             }
         });
+    }
+
+    public TestComponentFactory(ComponentsExample componentsExample) {
+        this();
+        this.componentsExample = componentsExample;
     }
 
     @Override
@@ -429,7 +435,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
     }
 
     public Spreadsheet getSpreadsheet() {
-        return ((SpreadsheetDemoUI) UI.getCurrent()).spreadsheet;
+        return componentsExample.getSpreadsheet();
     }
 
 }
