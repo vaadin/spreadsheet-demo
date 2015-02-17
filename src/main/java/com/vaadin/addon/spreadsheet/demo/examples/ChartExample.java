@@ -36,9 +36,9 @@ public class ChartExample implements SpreadsheetExample {
 
         initSpreadsheet();
         initChart();
-        layout.addComponents(spreadsheet, chart);
-        layout.setExpandRatio(spreadsheet, 1.0f);
+        layout.addComponents(chart, spreadsheet);
         layout.setExpandRatio(chart, 1.0f);
+        layout.setExpandRatio(spreadsheet, 1.0f);
     }
 
     @Override
