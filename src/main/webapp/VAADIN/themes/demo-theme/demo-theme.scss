@@ -27,34 +27,58 @@ $v-gradient: false;
   .v-splitpanel-second-container-main-layout {
   }
 
-  .links {
+  // Tree
+
+  .v-tree {
+    font-weight: $v-font-weight + 100;
+    color: valo-font-color($menu-background-color, 0.5);
+  }
+
+  .v-tree-node-children {
+    font-size: $v-font-size--small;
+  }
+
+  .v-tree-node-caption:after {
+    // Tree node selection
+    border-radius: 0;
+    $bg-color: darken($menu-background-color, 4%);
+    background-color: $bg-color;
+    color: valo-font-color($bg-color, 1);
+  }
+  
+
+  .link {
     position: absolute;
-    bottom: 8px;
+    bottom: 20px;
     left: 0px;
     text-align: center;
     width: 300px;
-  }
-
-  .link {
+    height: 40px;
     color: #c5cacf;
-  }
-
-  .linkIcon {
+    vertical-align: middle;
     font-size: 32px;
-    color: #c5cacf;
+    
   }
+
+  .v-icon + span {
+    margin-left: 14px;
+    position: relative;
+    bottom: 4px;
+    font-size: 16px;
+  }
+
 
   .logo {
     color: valo-font-color($menu-background-color, 1);
     font-weight: $v-font-weight + 100;
     text-align: center;
-    background: transparent url("vaadin-spreadsheet-icon.png") no-repeat 50% -15px;
-    background-size: 148px 144px;
-    padding-top: 120px;
+    background: transparent url("vaadin-spreadsheet-logo.svg") no-repeat 50% 10px;
+    background-size: 70px 70px;
+    padding-top: 90px;
     margin-bottom: 4px;
 
     .v-ie8 & {
-      background-image: url("vaadin-spreadsheet-icon.png");
+      background-image: url("vaadin-spreadsheet-logo.png");
     }
   }
 }

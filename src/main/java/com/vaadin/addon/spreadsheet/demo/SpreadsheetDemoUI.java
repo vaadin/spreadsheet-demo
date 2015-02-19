@@ -1,13 +1,12 @@
 package com.vaadin.addon.spreadsheet.demo;
 
-import static com.vaadin.ui.Alignment.MIDDLE_CENTER;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
@@ -33,7 +32,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -62,7 +60,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     private Tree tree;
     private HorizontalSplitPanel horizontalSplitPanel;
-    private HorizontalLayout links;
 
     public SpreadsheetDemoUI() {
         super();
@@ -77,29 +74,19 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         horizontalSplitPanel.setSplitPosition(300, Unit.PIXELS);
         horizontalSplitPanel.addStyleName("main-layout");
 
-        links = new HorizontalLayout();
-        links.setSpacing(true);
-        links.addStyleName("links");
+        final Link github = new Link("Source code on Github",
+                new ExternalResource(
+                        "https://github.com/vaadin/spreadsheet-demo"));
+        github.setIcon(FontAwesome.GITHUB);
+        github.addStyleName("link");
 
         setContent(new CssLayout() {
             {
                 setSizeFull();
                 addComponent(horizontalSplitPanel);
-                addComponent(links);
+                addComponent(github);
             }
         });
-
-        Link github = new Link("Source code on Github", new ExternalResource(
-                "https://github.com/vaadin/spreadsheet-demo"));
-        github.addStyleName("link");
-
-        Link githubIcon = new Link("", new ExternalResource(
-                "https://github.com/vaadin/spreadsheet-demo"));
-        githubIcon.addStyleName("linkIcon");
-
-        githubIcon.setIcon(FontAwesome.GITHUB);
-        links.addComponents(githubIcon, github);
-        links.setComponentAlignment(github, MIDDLE_CENTER);
 
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
@@ -120,6 +107,15 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         content.addComponents(logo, tree);
         horizontalSplitPanel.setFirstComponent(content);
 
+        initSelection();
+    }
+
+    private void initSelection() {
+        Iterator<?> iterator = tree.getItemIds().iterator();
+        if (iterator.hasNext()) {
+            tree.expandItem(iterator.next());
+            tree.select(iterator.next());
+        }
     }
 
     private Container getContainer() {
