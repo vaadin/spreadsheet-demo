@@ -76,16 +76,16 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         final Sheet sheet = getTestWorkbook().createSheet("Custom Components");
         Row lastRow = sheet.createRow(100);
         lastRow.createCell(100, Cell.CELL_TYPE_BOOLEAN).setCellValue(true);
-        sheet.setColumnWidth(0, 6000);
-        sheet.setColumnWidth(1, 6000);
-        sheet.setColumnWidth(2, 6000);
-        sheet.setColumnWidth(3, 6000);
-        sheet.setColumnWidth(4, 6000);
-        sheet.setColumnWidth(5, 6000);
+        sheet.setColumnWidth(0, 7800);
+        sheet.setColumnWidth(1, 3800);
+        sheet.setColumnWidth(2, 6100);
+        sheet.setColumnWidth(3, 7200);
+        sheet.setColumnWidth(4, 5900);
+        sheet.setColumnWidth(5, 8200);
 
         for (int i = 0; i < data.length; i++) {
             Row row = sheet.createRow(i);
-            row.setHeightInPoints(25F);
+            row.setHeightInPoints(28F);
             for (int j = 0; j < data[0].length; j++) {
                 Cell cell = row.createCell(j);
                 Object value = data[i][j];
@@ -129,7 +129,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             }
         }
         Row row5 = sheet.createRow(5);
-        row5.setHeightInPoints(20F);
+        row5.setHeightInPoints(28F);
         row5.createCell(0).setCellValue(
                 "This cell has a value, and a component (label)");
         row5.createCell(1).setCellValue("This cell has a value, and a button");
@@ -139,7 +139,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         lockedCellStyle.setLocked(true);
         cell2.setCellStyle(lockedCellStyle);
         Row row6 = sheet.createRow(6);
-        row6.setHeightInPoints(22F);
+        row6.setHeightInPoints(28F);
         comboBox = new ComboBox();
         for (String s : comboBoxValues) {
             comboBox.addItem(s);
@@ -253,7 +253,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             if (rowIndex == 3) {
                 customEditor.setWidth("100%");
             } else {
-                customEditor.setWidth("100px");
+                customEditor.setWidth("130px");
                 customEditor.setCaption("Col " + columnIndex + " Row "
                         + rowIndex);
             }
@@ -310,9 +310,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             if (!hidden) {
                 if (columnIndex == 0) {
                     Label label = new Label(
-                            "<div style=\"text-overflow: ellipsis; font-size: 15pt;"
-                                    + "overflow: hidden; white-space: nowrap;\">Custom"
-                                    + "Components in this row.</div>",
+                            "<div style=\"text-overflow: ellipsis; overflow: hidden; white-space: nowrap;\">Row with Custom Components</div>",
                             ContentMode.HTML);
                     return label;
                 }
@@ -410,6 +408,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 if (nativeSelect == null) {
                     nativeSelect = new NativeSelect();
                     nativeSelect.addItem("JEE");
+                    nativeSelect.setHeight("100%");
                     nativeSelect.setWidth("100%");
                 }
                 return nativeSelect;

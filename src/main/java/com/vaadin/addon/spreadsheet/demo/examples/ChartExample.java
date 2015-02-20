@@ -17,8 +17,8 @@ import com.vaadin.addon.charts.model.Labels;
 import com.vaadin.addon.charts.model.PlotOptionsPie;
 import com.vaadin.addon.charts.model.Tooltip;
 import com.vaadin.addon.spreadsheet.Spreadsheet;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeEvent;
-import com.vaadin.addon.spreadsheet.Spreadsheet.SelectionChangeListener;
+import com.vaadin.addon.spreadsheet.Spreadsheet.CellValueChangeEvent;
+import com.vaadin.addon.spreadsheet.Spreadsheet.CellValueChangeListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
@@ -66,10 +66,9 @@ public class ChartExample implements SpreadsheetExample {
 
     private void initSpreadsheet() {
         spreadsheet = new Spreadsheet();
-        spreadsheet.addSelectionChangeListener(new SelectionChangeListener() {
-
+        spreadsheet.addCellValueChangeListener(new CellValueChangeListener() {
             @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
+            public void onCellValueChange(CellValueChangeEvent event) {
                 updateChartData();
             }
         });
