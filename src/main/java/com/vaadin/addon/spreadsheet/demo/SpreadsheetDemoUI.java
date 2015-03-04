@@ -6,8 +6,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -113,12 +117,44 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     private void initSelection() {
         Iterator<?> iterator = tree.getItemIds().iterator();
         if (iterator.hasNext()) {
-            tree.expandItem(iterator.next());
+            iterator.next();
+        }
+        if (iterator.hasNext()) {
             tree.select(iterator.next());
         }
     }
 
     private Container getContainer() {
+        HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
+        hierarchicalContainer.addContainerProperty("displayName", String.class,
+                "");
+
+        Item groupItem;
+        List<Class<? extends SpreadsheetExample>> examples = getExamples();
+        for (Class<? extends SpreadsheetExample> class1 : examples) {
+            if (class1.getAnnotation(SkipFromDemo.class) != null) {
+                continue;
+            }
+            groupItem = hierarchicalContainer.addItem(class1);
+            groupItem.getItemProperty("displayName").setValue(
+                    splitCamelCase(class1.getSimpleName()));
+            hierarchicalContainer.setChildrenAllowed(class1, false);
+        }
+
+        Collection<File> files = getFiles();
+        groupItem = hierarchicalContainer.addItem("sampleFiles");
+        groupItem.getItemProperty("displayName").setValue("MS Excel Support");
+        for (File file : files) {
+            Item fileItem = hierarchicalContainer.addItem(file);
+            fileItem.getItemProperty("displayName").setValue(file.getName());
+            hierarchicalContainer.setParent(file, "sampleFiles");
+            hierarchicalContainer.setChildrenAllowed(file, false);
+        }
+
+        return hierarchicalContainer;
+    }
+
+    private Collection<File> getFiles() {
         File root = null;
         try {
             ClassLoader classLoader = SpreadsheetDemoUI.class.getClassLoader();
@@ -145,36 +181,25 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 }
             }
         });
+        return testSheetContainer.getItemIds();
+    }
 
-        HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
-        hierarchicalContainer.addContainerProperty("displayName", String.class,
-                "");
-
-        Item groupItem = hierarchicalContainer.addItem("sampleFiles");
-        groupItem.getItemProperty("displayName").setValue("MS Excel Support");
-        for (File file : testSheetContainer.getItemIds()) {
-            Item fileItem = hierarchicalContainer.addItem(file);
-            fileItem.getItemProperty("displayName").setValue(file.getName());
-            hierarchicalContainer.setParent(file, "sampleFiles");
-            hierarchicalContainer.setChildrenAllowed(file, false);
-        }
-
+    private List<Class<? extends SpreadsheetExample>> getExamples() {
         Reflections reflections = new Reflections(
                 "com.vaadin.addon.spreadsheet.demo.examples");
-
-        Set<Class<? extends SpreadsheetExample>> subTypes = reflections
-                .getSubTypesOf(SpreadsheetExample.class);
-        for (Class<? extends SpreadsheetExample> class1 : subTypes) {
-            if (class1.getAnnotation(SkipFromDemo.class) != null) {
-                continue;
-            }
-            groupItem = hierarchicalContainer.addItem(class1);
-            groupItem.getItemProperty("displayName").setValue(
-                    splitCamelCase(class1.getSimpleName()));
-            hierarchicalContainer.setChildrenAllowed(class1, false);
-
-        }
-        return hierarchicalContainer;
+        List<Class<? extends SpreadsheetExample>> examples = new ArrayList<Class<? extends SpreadsheetExample>>(
+                reflections.getSubTypesOf(SpreadsheetExample.class));
+        Collections.sort(examples,
+                new Comparator<Class<? extends SpreadsheetExample>>() {
+                    @Override
+                    public int compare(Class<? extends SpreadsheetExample> o1,
+                            Class<? extends SpreadsheetExample> o2) {
+                        String simpleName = o1.getSimpleName();
+                        String simpleName2 = o2.getSimpleName();
+                        return simpleName.compareTo(simpleName2);
+                    }
+                });
+        return examples;
     }
 
     static String splitCamelCase(String s) {
