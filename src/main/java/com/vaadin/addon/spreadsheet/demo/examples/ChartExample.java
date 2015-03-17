@@ -5,8 +5,6 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellRangeAddress;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -23,8 +21,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
 public class ChartExample implements SpreadsheetExample {
-
-    private static final long serialVersionUID = -4299390593956043741L;
 
     private VerticalLayout layout;
     private Chart chart;
@@ -84,9 +80,6 @@ public class ChartExample implements SpreadsheetExample {
         spreadsheet.createCell(5, 0, "Brand 3");
         spreadsheet.createCell(5, 1, 3d);
         spreadsheet.setColumnWidth(0, 130);
-        Sheet currentSheet = spreadsheet.getActiveSheet();
-        currentSheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 1));
-        currentSheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
     }
 
     private void updateChartData() {
