@@ -53,6 +53,8 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
 
     private final ComboBox comboBox;
 
+    private boolean initializingComboBoxValue;
+
     private Button button;
 
     private Button button2;
@@ -150,12 +152,16 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
 
             @Override
             public void valueChange(ValueChangeEvent event) {
-                String s = (String) comboBox.getValue();
-                CellReference cr = getSpreadsheet().getSelectedCellReference();
-                Cell cell = getSpreadsheet().getCell(cr.getRow(), cr.getCol());
-                if (cell != null) {
-                    cell.setCellValue(s);
-                    getSpreadsheet().refreshCells(cell);
+                if (!initializingComboBoxValue) {
+                    String s = (String) comboBox.getValue();
+                    CellReference cr = getSpreadsheet()
+                            .getSelectedCellReference();
+                    Cell cell = getSpreadsheet().getCell(cr.getRow(),
+                            cr.getCol());
+                    if (cell != null) {
+                        cell.setCellValue(s);
+                        getSpreadsheet().refreshCells(cell);
+                    }
                 }
             }
         });
@@ -260,10 +266,11 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             return;
         }
         if (customEditor.equals(comboBox)) {
-
+            initializingComboBoxValue = true;
             String stringCellValue = cell != null ? cell.getStringCellValue()
                     : null;
             comboBox.setValue(stringCellValue);
+            initializingComboBoxValue = false;
         }
 
         if (cell != null) {
