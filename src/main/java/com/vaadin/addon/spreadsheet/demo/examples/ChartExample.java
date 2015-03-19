@@ -4,6 +4,9 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.vaadin.addon.charts.Chart;
@@ -12,18 +15,23 @@ import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Labels;
+import com.vaadin.addon.charts.model.Legend;
+import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsPie;
 import com.vaadin.addon.charts.model.Tooltip;
+import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.Spreadsheet.CellValueChangeEvent;
 import com.vaadin.addon.spreadsheet.Spreadsheet.CellValueChangeListener;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
 public class ChartExample implements SpreadsheetExample {
 
     private VerticalLayout layout;
-    private Chart chart;
+    private HorizontalLayout chartsLayout;
+    private Collection<Chart> charts;
     private Spreadsheet spreadsheet;
 
     public ChartExample() {
@@ -31,9 +39,9 @@ public class ChartExample implements SpreadsheetExample {
         layout.setSizeFull();
 
         initSpreadsheet();
-        initChart();
-        layout.addComponents(chart, spreadsheet);
-        layout.setExpandRatio(chart, 1.0f);
+        initCharts();
+        layout.addComponents(chartsLayout, spreadsheet);
+        layout.setExpandRatio(chartsLayout, 1.0f);
         layout.setExpandRatio(spreadsheet, 1.0f);
     }
 
@@ -42,8 +50,21 @@ public class ChartExample implements SpreadsheetExample {
         return layout;
     }
 
-    private void initChart() {
-        chart = new Chart(ChartType.PIE);
+    private void initCharts() {
+        chartsLayout = new HorizontalLayout();
+        chartsLayout.setSizeFull();
+        charts = new ArrayList<Chart>();
+        charts.add(createPieChart());
+        charts.add(createColumnChart());
+        for (Chart chart : charts) {
+            chartsLayout.addComponents(chart);
+            chartsLayout.setExpandRatio(chart, 1.0f);
+        }
+        updateChartsData();
+    }
+
+    private Chart createPieChart() {
+        Chart chart = new Chart(ChartType.PIE);
         chart.setSizeFull();
         Configuration conf = chart.getConfiguration();
         PlotOptionsPie plotOptions = new PlotOptionsPie();
@@ -55,9 +76,20 @@ public class ChartExample implements SpreadsheetExample {
         labels.setFormatter("''+ this.point.name +': '+ this.percentage.toFixed(2) +' %'");
         plotOptions.setDataLabels(labels);
         conf.setPlotOptions(plotOptions);
+        return chart;
+    }
 
-        updateChartData();
+    private Chart createColumnChart() {
+        Chart chart = new Chart(ChartType.COLUMN);
+        chart.setSizeFull();
+        Configuration conf = chart.getConfiguration();
+        PlotOptionsColumn plotOptions = new PlotOptionsColumn();
+        conf.setPlotOptions(plotOptions);
+        Legend legend = new Legend();
+        legend.setEnabled(false);
+        conf.setLegend(legend);
 
+        return chart;
     }
 
     private void initSpreadsheet() {
@@ -65,7 +97,7 @@ public class ChartExample implements SpreadsheetExample {
         spreadsheet.addCellValueChangeListener(new CellValueChangeListener() {
             @Override
             public void onCellValueChange(CellValueChangeEvent event) {
-                updateChartData();
+                updateChartsData();
             }
         });
         spreadsheet.createCell(0, 0,
@@ -82,9 +114,16 @@ public class ChartExample implements SpreadsheetExample {
         spreadsheet.setColumnWidth(0, 130);
     }
 
-    private void updateChartData() {
+    private void updateChartsData() {
+        for (Chart chart : charts) {
+            updateChartData(chart);
+        }
+    }
+
+    private void updateChartData(Chart chart) {
         int rowIndex = 3;
         Configuration conf = chart.getConfiguration();
+        XAxis xAxis = conf.getxAxis();
         String oldTitle = conf.getTitle().getText();
         String newTitle = getStringValue(1, 0);
         conf.setTitle(newTitle);
@@ -93,15 +132,18 @@ public class ChartExample implements SpreadsheetExample {
             oldSeries = (DataSeries) conf.getSeries().get(0);
         }
         DataSeries series = new DataSeries();
+        Collection<String> categories = new ArrayList<String>();
         while (!isEmpty(getStringValue(rowIndex, 0))) {
             series.add(new DataSeriesItem(getStringValue(rowIndex, 0),
                     getNumericValue(rowIndex, 1)));
+            categories.add(getStringValue(rowIndex, 0));
             rowIndex++;
         }
         if (oldSeries == null
                 || !series.toString().equals(oldSeries.toString())
                 || !newTitle.equals(oldTitle)) {
             conf.setSeries(series);
+            xAxis.setCategories(categories.toArray(new String[] {}));
             chart.drawChart();
         }
     }
