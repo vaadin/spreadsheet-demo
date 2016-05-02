@@ -107,7 +107,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         tree.setNullSelectionAllowed(false);
         tree.setWidth("100%");
         tree.addValueChangeListener(this);
-
         content.addComponents(logo, tree);
         horizontalSplitPanel.setFirstComponent(content);
 
@@ -116,9 +115,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     private void initSelection() {
         Iterator<?> iterator = tree.getItemIds().iterator();
-        if (iterator.hasNext()) {
-            iterator.next();
-        }
         if (iterator.hasNext()) {
             tree.select(iterator.next());
         }
@@ -129,6 +125,14 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         hierarchicalContainer.addContainerProperty("displayName", String.class,
                 "");
 
+        Item fileItem;
+        Collection<File> files = getFiles();
+        for (File file : files) {
+            fileItem = hierarchicalContainer.addItem(file);
+            fileItem.getItemProperty("displayName").setValue(file.getName());
+            hierarchicalContainer.setChildrenAllowed(file, false);
+        }
+
         Item groupItem;
         List<Class<? extends SpreadsheetExample>> examples = getExamples();
         for (Class<? extends SpreadsheetExample> class1 : examples) {
@@ -136,19 +140,9 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 continue;
             }
             groupItem = hierarchicalContainer.addItem(class1);
-            groupItem.getItemProperty("displayName").setValue(
-                    splitCamelCase(class1.getSimpleName()));
+            groupItem.getItemProperty("displayName")
+                    .setValue(splitCamelCase(class1.getSimpleName()));
             hierarchicalContainer.setChildrenAllowed(class1, false);
-        }
-
-        Collection<File> files = getFiles();
-        groupItem = hierarchicalContainer.addItem("sampleFiles");
-        groupItem.getItemProperty("displayName").setValue("MS Excel Support");
-        for (File file : files) {
-            Item fileItem = hierarchicalContainer.addItem(file);
-            fileItem.getItemProperty("displayName").setValue(file.getName());
-            hierarchicalContainer.setParent(file, "sampleFiles");
-            hierarchicalContainer.setChildrenAllowed(file, false);
         }
 
         return hierarchicalContainer;
@@ -158,8 +152,8 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         File root = null;
         try {
             ClassLoader classLoader = SpreadsheetDemoUI.class.getClassLoader();
-            URL resource = classLoader.getResource("testsheets"
-                    + File.separator);
+            URL resource = classLoader
+                    .getResource("testsheets" + File.separator);
             if (resource != null) {
                 root = new File(resource.toURI());
             }
@@ -203,9 +197,10 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     }
 
     static String splitCamelCase(String s) {
-        String replaced = s.replaceAll(String.format("%s|%s|%s",
-                "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])",
-                "(?<=[A-Za-z])(?=[^A-Za-z])"), " ");
+        String replaced = s.replaceAll(
+                String.format("%s|%s|%s", "(?<=[A-Z])(?=[A-Z][a-z])",
+                        "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"),
+                " ");
         replaced = replaced.replaceAll("Example", "");
         return replaced.trim();
     }
