@@ -46,6 +46,13 @@ $v-gradient: false;
     color: valo-font-color($bg-color, 1);
   }
   
+  .v-progressbar-wrapper {
+  	height: 30px;
+  }
+  
+  .gwt-FileUpload {
+    
+  }
 
   .link {
     position: absolute;
@@ -58,6 +65,10 @@ $v-gradient: false;
     vertical-align: middle;
     font-size: 32px;
     
+  }
+  
+  .header {
+  	margin: 20px;
   }
 
   .v-icon + span {

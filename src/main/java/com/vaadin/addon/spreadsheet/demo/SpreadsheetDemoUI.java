@@ -19,6 +19,7 @@ import org.reflections.Reflections;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.SpreadsheetFactory;
+import com.vaadin.addon.spreadsheet.demo.examples.FileUploadExample;
 import com.vaadin.addon.spreadsheet.demo.examples.SkipFromDemo;
 import com.vaadin.addon.spreadsheet.demo.examples.SpreadsheetExample;
 import com.vaadin.annotations.Theme;
