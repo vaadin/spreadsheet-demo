@@ -73,7 +73,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     @Override
     protected void init(VaadinRequest request) {
-
         horizontalSplitPanel = new HorizontalSplitPanel();
         horizontalSplitPanel.setSplitPosition(300, Unit.PIXELS);
         horizontalSplitPanel.addStyleName("main-layout");

@@ -9,7 +9,5 @@
 
     <inherits name="com.vaadin.addon.charts.Widgetset" />
 
-    <inherits name="com.vaadin.addon.timeline.gwt.TimelineWidgetSet" />
-
     <inherits name="com.vaadin.addon.spreadsheet.demo.DemoWidgetSet" />
 </module>

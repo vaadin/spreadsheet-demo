@@ -15,8 +15,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<vaadin.version>7.6.4</vaadin.version>
-		<spreadsheet.version>1.1.7</spreadsheet.version>
-		<vaadin.charts.version>2.1.0</vaadin.charts.version>
+		<spreadsheet.version>1.1-SNAPSHOT</spreadsheet.version>
+		<vaadin.charts.version>3.0.0</vaadin.charts.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
 	<!-- <scm> <url>git://github.com/mygithubaccount/Spreadsheet.git</url> <connection>scm:git:git://github.com/mygithubaccount/Spreadsheet.git</connection>
@@ -72,6 +72,11 @@
 			<groupId>com.vaadin.addon</groupId>
 			<artifactId>vaadin-charts</artifactId>
 			<version>${vaadin.charts.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin.addon</groupId>
+			<artifactId>spreadsheet-charts-integration</artifactId>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
