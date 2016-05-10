@@ -122,6 +122,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     private Container getContainer() {
         HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
+        hierarchicalContainer.addContainerProperty("order", Integer.class, 1);
         hierarchicalContainer.addContainerProperty("displayName", String.class,
                 "");
 
@@ -129,7 +130,14 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         Collection<File> files = getFiles();
         for (File file : files) {
             fileItem = hierarchicalContainer.addItem(file);
-            fileItem.getItemProperty("displayName").setValue(file.getName());
+            if (file.getName().equals("Loan Calculator.xlsx")) {
+                fileItem.getItemProperty("order").setValue(0);
+            }
+            if (file.getName().equals("Embedded Charts.xlsx")) {
+                fileItem.getItemProperty("order").setValue(2);
+            }
+            fileItem.getItemProperty("displayName").setValue(
+                    file.getName().subSequence(0, file.getName().indexOf('.')));
             hierarchicalContainer.setChildrenAllowed(file, false);
         }
 
@@ -140,10 +148,18 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 continue;
             }
             groupItem = hierarchicalContainer.addItem(class1);
+            if (class1.getSimpleName().equals("ChartExample")) {
+                groupItem.getItemProperty("order").setValue(2);
+            }
             groupItem.getItemProperty("displayName")
                     .setValue(splitCamelCase(class1.getSimpleName()));
             hierarchicalContainer.setChildrenAllowed(class1, false);
         }
+
+        boolean[] ascending = { true, true };
+        hierarchicalContainer.sort(
+                hierarchicalContainer.getContainerPropertyIds().toArray(),
+                ascending);
 
         return hierarchicalContainer;
     }
