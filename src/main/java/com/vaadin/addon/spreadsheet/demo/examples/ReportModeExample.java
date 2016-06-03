@@ -27,8 +27,8 @@ public class ReportModeExample implements SpreadsheetExample {
         File sampleFile = null;
         try {
             ClassLoader classLoader = SpreadsheetDemoUI.class.getClassLoader();
-            URL resource = classLoader.getResource("testsheets"
-                    + File.separator + "Simple Invoice.xlsx");
+            URL resource = classLoader.getResource(
+                    "testsheets" + File.separator + "Simple Invoice.xlsx");
             if (resource != null) {
                 sampleFile = new File(resource.toURI());
                 spreadsheet = new Spreadsheet(sampleFile);

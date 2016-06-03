@@ -7,7 +7,9 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -71,7 +73,8 @@ public class ChartExample implements SpreadsheetExample {
         plotOptions.setAnimation(false);
         DataLabels labels = new DataLabels();
         labels.setEnabled(true);
-        labels.setFormatter("''+ this.point.name +': '+ this.percentage.toFixed(2) +' %'");
+        labels.setFormatter(
+                "''+ this.point.name +': '+ this.percentage.toFixed(2) +' %'");
         plotOptions.setDataLabels(labels);
         conf.setPlotOptions(plotOptions);
         return chart;
@@ -98,8 +101,18 @@ public class ChartExample implements SpreadsheetExample {
                 updateChartsData();
             }
         });
-        spreadsheet.createCell(0, 0,
+        CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
+                .createCellStyle();
+        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        Cell cell = spreadsheet.createCell(0, 0,
                 "Edit this spreadsheet to alter chart title and data");
+        cell.setCellStyle(backgroundColorStyle);
+
+        for (int i = 1; i <= 3; i++) {
+            cell = spreadsheet.createCell(0, i, "");
+            cell.setCellStyle(backgroundColorStyle);
+        }
+
         spreadsheet.createCell(1, 0, "This is chart title");
         spreadsheet.createCell(2, 0, "Category");
         spreadsheet.createCell(2, 1, "Amount");
@@ -110,6 +123,8 @@ public class ChartExample implements SpreadsheetExample {
         spreadsheet.createCell(5, 0, "Brand 3");
         spreadsheet.createCell(5, 1, 3d);
         spreadsheet.setColumnWidth(0, 130);
+
+        spreadsheet.refreshCells(cell);
     }
 
     private void updateChartsData() {
@@ -137,8 +152,7 @@ public class ChartExample implements SpreadsheetExample {
             categories.add(getStringValue(rowIndex, 0));
             rowIndex++;
         }
-        if (oldSeries == null
-                || !series.toString().equals(oldSeries.toString())
+        if (oldSeries == null || !series.toString().equals(oldSeries.toString())
                 || !newTitle.equals(oldTitle)) {
             conf.setSeries(series);
             xAxis.setCategories(categories.toArray(new String[] {}));
@@ -157,9 +171,8 @@ public class ChartExample implements SpreadsheetExample {
 
     private Double getNumericValue(int rowIndex, int columnIndex) {
         Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
-        if (cell != null
-                && (cell.getCellType() == CELL_TYPE_NUMERIC || (cell
-                        .getCellType() == CELL_TYPE_FORMULA && cell
+        if (cell != null && (cell.getCellType() == CELL_TYPE_NUMERIC
+                || (cell.getCellType() == CELL_TYPE_FORMULA && cell
                         .getCachedFormulaResultType() == CELL_TYPE_NUMERIC))) {
             return cell.getNumericCellValue();
         }

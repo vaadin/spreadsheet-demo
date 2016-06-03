@@ -6,6 +6,7 @@ import static com.vaadin.shared.ui.colorpicker.Color.WHITE;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -29,8 +30,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
 import com.vaadin.ui.components.colorpicker.ColorChangeListener;
 
-public class BasicStylingExample implements SpreadsheetExample,
-        SelectionChangeListener {
+public class BasicStylingExample
+        implements SpreadsheetExample, SelectionChangeListener {
 
     private static final long serialVersionUID = 6330513476932056681L;
 
@@ -59,6 +60,45 @@ public class BasicStylingExample implements SpreadsheetExample,
     private void initSpreadsheet() {
         spreadsheet = new Spreadsheet();
         spreadsheet.addSelectionChangeListener(this);
+
+        Font fontBoldExample = spreadsheet.getWorkbook().createFont();
+        fontBoldExample.setBold(true);
+        CellStyle fontBoldExampleStyle = spreadsheet.getWorkbook()
+                .createCellStyle();
+        fontBoldExampleStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        fontBoldExampleStyle.setFont(fontBoldExample);
+        Cell fontExampleCell = spreadsheet.createCell(0, 0,
+                "Click the 'B' button in the top left corner to toggle bold font on and off.");
+        fontExampleCell.setCellStyle(fontBoldExampleStyle);
+
+        CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
+                .createCellStyle();
+        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        Cell backgroundExampleCell = spreadsheet.createCell(2, 0,
+                "Click the 'Background Color' button to select and change the background color of a cell.");
+        backgroundExampleCell.setCellStyle(backgroundColorStyle);
+
+        Font fontColorExample = spreadsheet.getWorkbook().createFont();
+        fontColorExample.setColor(HSSFColor.LIGHT_BLUE.index);
+        CellStyle fontColorExampleStyle = spreadsheet.getWorkbook()
+                .createCellStyle();
+        fontColorExampleStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        fontColorExampleStyle.setFont(fontColorExample);
+        Cell fontColorExampleCell = spreadsheet.createCell(4, 0,
+                "Click the 'Font Color' button to select and change the font color of a cell.");
+        fontColorExampleCell.setCellStyle(fontColorExampleStyle);
+
+        Cell cell;
+        for (int i = 0; i <= 4; i = i + 2) {
+            for (int j = 1; j <= 9; j++) {
+                cell = spreadsheet.createCell(i, j, "");
+                cell.setCellStyle(backgroundColorStyle);
+            }
+        }
+
+        spreadsheet.refreshCells(fontExampleCell, backgroundExampleCell,
+                fontColorExampleCell);
+
     }
 
     private void initStyleToolbar() {
@@ -122,8 +162,8 @@ public class BasicStylingExample implements SpreadsheetExample,
                 // Clone Cell CellStyle
                 // This cast an only be done when using .xlsx files
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                XSSFColor color = new XSSFColor(java.awt.Color.decode(newColor
-                        .getCSS()));
+                XSSFColor color = new XSSFColor(
+                        java.awt.Color.decode(newColor.getCSS()));
                 // Set new color value
                 style.setFillForegroundColor(color);
                 cell.setCellStyle(style);
@@ -143,8 +183,8 @@ public class BasicStylingExample implements SpreadsheetExample,
                 Cell cell = getOrCreateCell(cellRef);
                 // Workbook workbook = spreadsheet.getWorkbook();
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                XSSFColor color = new XSSFColor(java.awt.Color.decode(newColor
-                        .getCSS()));
+                XSSFColor color = new XSSFColor(
+                        java.awt.Color.decode(newColor.getCSS()));
                 XSSFFont font = (XSSFFont) cloneFont(style);
                 font.setColor(color);
                 style.setFont(font);
@@ -173,8 +213,8 @@ public class BasicStylingExample implements SpreadsheetExample,
 
     private Font cloneFont(CellStyle cellstyle) {
         Font newFont = spreadsheet.getWorkbook().createFont();
-        Font originalFont = spreadsheet.getWorkbook().getFontAt(
-                cellstyle.getFontIndex());
+        Font originalFont = spreadsheet.getWorkbook()
+                .getFontAt(cellstyle.getFontIndex());
         if (originalFont != null) {
             newFont.setBold(originalFont.getBold());
             newFont.setItalic(originalFont.getItalic());

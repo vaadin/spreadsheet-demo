@@ -1,27 +1,28 @@
 package com.vaadin.addon.spreadsheet.demo;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.SpreadsheetFactory;
-import com.vaadin.addon.spreadsheet.demo.examples.FileUploadExample;
 import com.vaadin.addon.spreadsheet.demo.examples.SkipFromDemo;
 import com.vaadin.addon.spreadsheet.demo.examples.SpreadsheetExample;
+import com.vaadin.addon.spreadsheet.demo.helpers.FileExampleHelper;
+import com.vaadin.addon.spreadsheet.demo.helpers.NavigationBarHelper;
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -36,13 +37,18 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.CssLayout;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
+import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * Demo class for the Spreadsheet component.
@@ -54,6 +60,7 @@ import com.vaadin.ui.VerticalLayout;
  * 
  */
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@JavaScript("prettify.js")
 @Theme("demo-theme")
 @Title("Vaadin Spreadsheet Demo")
 public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
@@ -64,7 +71,8 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     }
 
     private Tree tree;
-    private HorizontalSplitPanel horizontalSplitPanel;
+    private TabSheet tabSheet;
+    private NavigationBarHelper navigationBarHelper;
 
     public SpreadsheetDemoUI() {
         super();
@@ -74,7 +82,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
     @Override
     protected void init(VaadinRequest request) {
-        horizontalSplitPanel = new HorizontalSplitPanel();
+        HorizontalSplitPanel horizontalSplitPanel = new HorizontalSplitPanel();
         horizontalSplitPanel.setSplitPosition(300, Unit.PIXELS);
         horizontalSplitPanel.addStyleName("main-layout");
 
@@ -84,13 +92,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         github.setIcon(FontAwesome.GITHUB);
         github.addStyleName("link");
 
-        setContent(new CssLayout() {
-            {
-                setSizeFull();
-                addComponent(horizontalSplitPanel);
-                addComponent(github);
-            }
-        });
+        setContent(horizontalSplitPanel);
 
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
@@ -100,15 +102,41 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         logo.addStyleName("h3");
         logo.addStyleName("logo");
 
+        initNavigationBarHelper();
+
         tree = new Tree();
         tree.setImmediate(true);
+        tree.setHtmlContentAllowed(true);
         tree.setContainerDataSource(getContainer());
         tree.setItemCaptionPropertyId("displayName");
         tree.setNullSelectionAllowed(false);
         tree.setWidth("100%");
         tree.addValueChangeListener(this);
-        content.addComponents(logo, tree);
+        for (Object itemId : tree.rootItemIds()) {
+            tree.expandItem(itemId);
+        }
+        Panel panel = new Panel();
+        panel.setContent(tree);
+        panel.setSizeFull();
+        panel.setStyleName("panel");
+
+        content.setSizeFull();
+        content.addComponents(logo, panel, github);
+        content.setExpandRatio(panel, 1);
+
         horizontalSplitPanel.setFirstComponent(content);
+
+        tabSheet = new TabSheet();
+        tabSheet.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange(SelectedTabChangeEvent event) {
+                com.vaadin.ui.JavaScript
+                        .eval("setTimeout(function(){prettyPrint();},300);");
+            }
+        });
+        tabSheet.setSizeFull();
+        tabSheet.addStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
+        horizontalSplitPanel.setSecondComponent(tabSheet);
 
         initSelection();
     }
@@ -118,6 +146,36 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         if (iterator.hasNext()) {
             tree.select(iterator.next());
         }
+    }
+
+    private void initNavigationBarHelper() {
+        // add a navigation bar item for each example to the navigation bar
+        // helper
+        navigationBarHelper = new NavigationBarHelper();
+
+        // add items for file examples
+        navigationBarHelper.addNavigationItem("Formulas.xlsx",
+                "Basic Spreadsheet functionality",
+                "Use Excel features like freeze panes, <br> formulas, conditional formatting, <br> protected cells and comments",
+                0);
+        navigationBarHelper.addNavigationItem("Simple Invoice.xlsx",
+                "Simple invoice", "Use the spreadsheet for invoices", 1);
+        navigationBarHelper.addNavigationItem("Embedded Charts.xlsx",
+                "Embedded charts",
+                "Display charts from an Excel file <br> in the spreadsheet", 3);
+
+        // add items for class examples
+        navigationBarHelper.addNavigationItem("BasicStylingExample",
+                "Formatting", "Style your spreadsheet", 1);
+        navigationBarHelper.addNavigationItem("ChartExample", "Data binding",
+                "Display spreadsheet data <br> using Vaadin charts", 2);
+        navigationBarHelper.addNavigationItem("ComponentsExample",
+                "Use inline components",
+                "Use Vaadin components within <br> a spreadsheet", 1);
+        navigationBarHelper.addNavigationItem("FileUploadExample",
+                "Upload Excel files", "Upload a .xlsx or .xls file", 1);
+        navigationBarHelper.addNavigationItem("ReportModeExample",
+                "Report mode", "Use the read only mode <br> of spreadsheet", 1);
     }
 
     private Container getContainer() {
@@ -130,14 +188,10 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         Collection<File> files = getFiles();
         for (File file : files) {
             fileItem = hierarchicalContainer.addItem(file);
-            if (file.getName().equals("Loan Calculator.xlsx")) {
-                fileItem.getItemProperty("order").setValue(0);
-            }
-            if (file.getName().equals("Embedded Charts.xlsx")) {
-                fileItem.getItemProperty("order").setValue(2);
-            }
+            fileItem.getItemProperty("order").setValue(
+                    navigationBarHelper.getOrderNumber(file.getName()));
             fileItem.getItemProperty("displayName").setValue(
-                    file.getName().subSequence(0, file.getName().indexOf('.')));
+                    navigationBarHelper.getDisplayName(file.getName()));
             hierarchicalContainer.setChildrenAllowed(file, false);
         }
 
@@ -148,11 +202,10 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 continue;
             }
             groupItem = hierarchicalContainer.addItem(class1);
-            if (class1.getSimpleName().equals("ChartExample")) {
-                groupItem.getItemProperty("order").setValue(2);
-            }
-            groupItem.getItemProperty("displayName")
-                    .setValue(splitCamelCase(class1.getSimpleName()));
+            groupItem.getItemProperty("order").setValue(
+                    navigationBarHelper.getOrderNumber(class1.getSimpleName()));
+            groupItem.getItemProperty("displayName").setValue(
+                    navigationBarHelper.getDisplayName(class1.getSimpleName()));
             hierarchicalContainer.setChildrenAllowed(class1, false);
         }
 
@@ -199,16 +252,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 "com.vaadin.addon.spreadsheet.demo.examples");
         List<Class<? extends SpreadsheetExample>> examples = new ArrayList<Class<? extends SpreadsheetExample>>(
                 reflections.getSubTypesOf(SpreadsheetExample.class));
-        Collections.sort(examples,
-                new Comparator<Class<? extends SpreadsheetExample>>() {
-                    @Override
-                    public int compare(Class<? extends SpreadsheetExample> o1,
-                            Class<? extends SpreadsheetExample> o2) {
-                        String simpleName = o1.getSimpleName();
-                        String simpleName2 = o2.getSimpleName();
-                        return simpleName.compareTo(simpleName2);
-                    }
-                });
         return examples;
     }
 
@@ -224,19 +267,11 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     @Override
     public void valueChange(ValueChangeEvent event) {
         Object value = event.getProperty().getValue();
-        if (value instanceof File || value instanceof Class) {
-            open(value);
-        } else {
-            tree.expandItemsRecursively(value);
-            if (tree.hasChildren(value)) {
-                Object firstChild = tree.getChildren(value).iterator().next();
-                open(firstChild);
-                tree.setValue(firstChild);
-            }
-        }
+        open(value);
     }
 
     private void open(Object value) {
+        tabSheet.removeAllComponents();
         if (value instanceof File) {
             openFile((File) value);
         } else if (value instanceof Class) {
@@ -248,23 +283,48 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         try {
             SpreadsheetExample example = (SpreadsheetExample) value
                     .newInstance();
-            horizontalSplitPanel.setSecondComponent(example.getComponent());
+            tabSheet.addTab(example.getComponent(), "Demo");
+            addResourceTab(value, value.getSimpleName() + ".java",
+                    "Java Source");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void openFile(File file) {
+        Spreadsheet spreadsheet = FileExampleHelper.openFile(file);
+        tabSheet.addTab(spreadsheet, "Demo");
+        addResourceTab(FileExampleHelper.class,
+                FileExampleHelper.class.getSimpleName() + ".java",
+                "Java Source");
+    }
+
+    private void addResourceTab(Class clazz, String resourceName,
+            String tabName) {
         try {
-            Spreadsheet spreadsheet = new Spreadsheet(file);
-            horizontalSplitPanel.setSecondComponent(spreadsheet);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            InputStream resourceAsStream = clazz
+                    .getResourceAsStream(resourceName);
+            String code = IOUtils.toString(resourceAsStream);
+
+            Panel p = getSourcePanel(code);
+
+            tabSheet.addTab(p, tabName);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private Panel getSourcePanel(String code) {
+        Panel p = new Panel();
+        p.setWidth("100%");
+        p.setStyleName(ValoTheme.PANEL_BORDERLESS);
+        code = code.replace("&", "&amp;").replace("<", "&lt;").replace(">",
+                "&gt;");
+        Label c = new Label("<pre class='prettyprint'>" + code + "</pre>");
+        c.setContentMode(ContentMode.HTML);
+        c.setSizeUndefined();
+        p.setContent(c);
+        return p;
     }
 
 }

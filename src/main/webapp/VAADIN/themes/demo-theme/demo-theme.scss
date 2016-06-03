@@ -8,6 +8,7 @@ $v-shadow: false;
 $v-gradient: false;
 
 @import "../valo/valo.scss";
+@import "prettify.scss";
 
 @mixin demo-theme {
   @include valo;
@@ -27,6 +28,12 @@ $v-gradient: false;
   .v-splitpanel-second-container-main-layout {
   }
 
+  .panel {
+  	@include linear-gradient(to left, darken($menu-background-color, 5%) 0, $menu-background-color 9px);
+    color: valo-font-color($menu-background-color);
+    border-style: none;
+  }
+
   // Tree
 
   .v-tree {
@@ -34,28 +41,38 @@ $v-gradient: false;
     color: valo-font-color($menu-background-color, 0.5);
   }
 
-  .v-tree-node-children {
-    font-size: $v-font-size--small;
-  }
-
-  .v-tree-node-caption:after {
-    // Tree node selection
+  .v-tree-node-selected {
     border-radius: 0;
     $bg-color: darken($menu-background-color, 4%);
     background-color: $bg-color;
     color: valo-font-color($bg-color, 1);
   }
-  
+
+  .description {
+    font-weight: lighter;
+    font-size: $v-font-size--small;
+    padding-left: 18px;
+    pointer-events:none;
+  }
+
+  .v-tree-node-caption {
+    height: 100%;
+  }
+
+  .v-tree-node-caption::after {
+    // Tree node selection
+    display: none;
+  }
+
   .v-progressbar-wrapper {
   	height: 30px;
   }
-  
+
   .gwt-FileUpload {
-    
+
   }
 
   .link {
-    position: absolute;
     bottom: 20px;
     left: 0px;
     text-align: center;
@@ -64,9 +81,9 @@ $v-gradient: false;
     color: #c5cacf;
     vertical-align: middle;
     font-size: 32px;
-    
+
   }
-  
+
   .header {
   	margin: 20px;
   }
@@ -91,5 +108,12 @@ $v-gradient: false;
     .v-ie8 & {
       background-image: url("vaadin-spreadsheet-logo.png");
     }
+  }
+
+  pre.prettyprint {
+    font-size: $v-font-size--small;
+    border: none;
+    padding: round($v-unit-size / 2) $v-unit-size;
+    font-family: Menlo, Consolas, Courier New, monospace;
   }
 }

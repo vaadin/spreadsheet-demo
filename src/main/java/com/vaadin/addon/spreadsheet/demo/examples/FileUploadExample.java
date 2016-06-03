@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.ui.Alignment;
@@ -76,6 +79,20 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
 
     private void initSpreadsheetPanel() {
         Spreadsheet spreadsheet = new Spreadsheet();
+        CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
+                .createCellStyle();
+        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        Cell cell = spreadsheet.createCell(0, 0,
+                "Click the upload button to choose and upload an excel file.");
+        cell.setCellStyle(backgroundColorStyle);
+
+        for (int i = 1; i <= 5; i++) {
+            cell = spreadsheet.createCell(0, i, "");
+            cell.setCellStyle(backgroundColorStyle);
+        }
+
+        spreadsheet.refreshCells(cell);
+
         spreadsheetPanel = new Panel();
         spreadsheetPanel.setSizeFull();
         spreadsheetPanel.setContent(spreadsheet);
@@ -111,8 +128,8 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
     public void updateProgress(long readBytes, long contentLength) {
         if (readBytes > maxSize || contentLength > maxSize) {
             upload.interruptUpload();
-            Notification.show("File is to big. Maximum filesize: " + maxSize
-                    / 1000 + "KB");
+            Notification.show("File is to big. Maximum filesize: "
+                    + maxSize / 1000 + "KB");
         }
         progressBar.setValue(new Float(readBytes / (float) contentLength));
     }
@@ -128,4 +145,5 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
         progressBar.setVisible(true);
         layout.getUI().setPollInterval(100);
     }
+
 }
