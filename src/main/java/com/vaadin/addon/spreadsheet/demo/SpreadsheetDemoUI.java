@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -38,6 +39,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -64,6 +66,17 @@ import com.vaadin.ui.themes.ValoTheme;
 @Theme("demo-theme")
 @Title("Vaadin Spreadsheet Demo")
 public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
+
+    static final Properties prop = new Properties();
+    static {
+        try {
+            // load a properties file
+            prop.load(SpreadsheetDemoUI.class
+                    .getResourceAsStream("config.properties"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = SpreadsheetDemoUI.class, widgetset = "com.vaadin.addon.spreadsheet.demo.DemoWidgetSet")
@@ -104,6 +117,20 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
 
         initNavigationBarHelper();
 
+        Link homepage = new Link("Home page", new ExternalResource(
+                "https://vaadin.com/spreadsheet"));
+        Link javadoc = new Link("JavaDoc", new ExternalResource(
+                "http://demo.vaadin.com/javadoc/com.vaadin.addon/vaadin-spreadsheet/"
+                        + getVersion() + "/"));
+        Link manual = new Link(
+                "Manual",
+                new ExternalResource(
+                        "https://vaadin.com/docs/-/part/spreadsheet/spreadsheet-overview.html"));
+
+        HorizontalLayout links = new HorizontalLayout(homepage, javadoc, manual);
+        links.setSpacing(true);
+        links.addStyleName("links");
+
         tree = new Tree();
         tree.setImmediate(true);
         tree.setHtmlContentAllowed(true);
@@ -121,7 +148,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         panel.setStyleName("panel");
 
         content.setSizeFull();
-        content.addComponents(logo, panel, github);
+        content.addComponents(logo, links, panel, github);
         content.setExpandRatio(panel, 1);
 
         horizontalSplitPanel.setFirstComponent(content);
@@ -139,6 +166,10 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         horizontalSplitPanel.setSecondComponent(tabSheet);
 
         initSelection();
+    }
+
+    static String getVersion() {
+        return (String) prop.get("spreadsheet.version");
     }
 
     private void initSelection() {

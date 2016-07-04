@@ -236,14 +236,20 @@
 			</plugins>
 		</pluginManagement>
 		<resources>
-            <resource>
-                <directory>src/main/java</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/config.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>

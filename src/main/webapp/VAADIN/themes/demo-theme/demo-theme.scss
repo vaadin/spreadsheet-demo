@@ -33,6 +33,27 @@ $v-gradient: false;
     color: valo-font-color($menu-background-color);
     border-style: none;
   }
+  
+  // Sidebar links
+
+  .v-slot-links {
+    text-align: center;
+  }
+
+  .links {
+    font-size: $v-font-size--tiny;
+    font-weight: $v-font-weight + 100;
+    margin: 0 auto;
+  }
+
+  .links > .v-spacing {
+    text-align: center;
+    width: 1.6em;
+
+    &:before {
+      content: "\00b7";
+    }
+  }
 
   // Tree
 
