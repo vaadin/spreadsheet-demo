@@ -37,7 +37,6 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
@@ -105,11 +104,13 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         github.setIcon(FontAwesome.GITHUB);
         github.addStyleName("link");
 
+        Label version = new Label("Version " + getVersion());
+        version.addStyleName("version");
+
         setContent(horizontalSplitPanel);
 
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
-        content.setMargin(new MarginInfo(false, false, true, false));
 
         Label logo = new Label("Vaadin Spreadsheet");
         logo.addStyleName("h3");
@@ -148,7 +149,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         panel.setStyleName("panel");
 
         content.setSizeFull();
-        content.addComponents(logo, links, panel, github);
+        content.addComponents(logo, links, panel, github, version);
         content.setExpandRatio(panel, 1);
 
         horizontalSplitPanel.setFirstComponent(content);

@@ -105,6 +105,16 @@ $v-gradient: false;
 
   }
 
+  .version {
+    text-align: right;
+	width: 300px;
+    height: 30px;
+    color: #c5cacf;
+    vertical-align: bottom;
+    font-size: 12px;
+    padding-right: 10px;
+  }
+
   .header {
   	margin: 20px;
   }
