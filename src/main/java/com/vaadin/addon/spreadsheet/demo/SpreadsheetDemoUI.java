@@ -195,6 +195,9 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         navigationBarHelper.addNavigationItem("Embedded Charts.xlsx",
                 "Embedded charts",
                 "Display charts from an Excel file <br> in the spreadsheet", 3);
+        navigationBarHelper.addNavigationItem("Grouping.xlsx",
+                "Grouping",
+                "Use the Excel feature for <br> grouping rows and colums", 1);
 
         // add items for class examples
         navigationBarHelper.addNavigationItem("BasicStylingExample",
