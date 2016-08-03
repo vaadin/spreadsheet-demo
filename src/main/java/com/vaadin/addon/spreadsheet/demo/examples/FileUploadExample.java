@@ -53,7 +53,6 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
         initUpload();
         initProgressBar();
         HorizontalLayout header = new HorizontalLayout();
-        header.setStyleName("header");
         header.setWidth("100%");
         header.setMargin(true);
         header.addComponents(upload, progressBar);

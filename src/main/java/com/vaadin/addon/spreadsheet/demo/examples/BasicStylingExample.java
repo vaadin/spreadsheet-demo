@@ -29,6 +29,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
 import com.vaadin.ui.components.colorpicker.ColorChangeListener;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class BasicStylingExample
         implements SpreadsheetExample, SelectionChangeListener {
@@ -127,6 +128,9 @@ public class BasicStylingExample
             }
         });
         stylingToolbar.addComponents(boldButton, backgroundColor, fontColor);
+        boldButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+        backgroundColor.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+        fontColor.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     }
 
     private void updateSelectedCellsBold() {

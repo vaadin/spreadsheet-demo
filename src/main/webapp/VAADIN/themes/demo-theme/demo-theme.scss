@@ -33,7 +33,7 @@ $v-gradient: false;
     color: valo-font-color($menu-background-color);
     border-style: none;
   }
-  
+
   // Sidebar links
 
   .v-slot-links {
@@ -60,6 +60,10 @@ $v-gradient: false;
   .v-tree {
     font-weight: $v-font-weight + 100;
     color: valo-font-color($menu-background-color, 0.5);
+  }
+
+  .v-tree-node {
+    padding-bottom: 10px;
   }
 
   .v-tree-node-selected {
@@ -113,10 +117,6 @@ $v-gradient: false;
     vertical-align: bottom;
     font-size: 12px;
     padding-right: 10px;
-  }
-
-  .header {
-  	margin: 20px;
   }
 
   .v-icon + span {
