@@ -260,7 +260,7 @@ public class BasicStylingExample
     }
 
     private Color convertColor(XSSFColor foregroundColor) {
-        byte[] argb = foregroundColor.getARgb();
+        byte[] argb = foregroundColor.getARGB();
         return new Color(byteToInt(argb[1]), byteToInt(argb[2]),
                 byteToInt(argb[3]), byteToInt(argb[0]));
     }
