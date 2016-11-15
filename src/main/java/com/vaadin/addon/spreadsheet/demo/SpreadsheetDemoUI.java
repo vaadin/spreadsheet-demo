@@ -186,17 +186,20 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         navigationBarHelper = new NavigationBarHelper();
 
         // add items for file examples
+        navigationBarHelper.addNavigationItem("Named Ranges Chart.xlsx",
+                "Basic functionality", "Edit imported Excel file with "
+                        + "<br>formatting, basic formulas, and a <br>chart. "
+                                + "Updates dynamically when <br> values are edited.",
+                        0);
         navigationBarHelper.addNavigationItem("Formulas.xlsx",
-                "Basic Spreadsheet functionality",
-                "Use Excel features like freeze panes, <br> formulas, conditional formatting, <br> protected cells and comments",
-                0);
+                "Collaborative features",
+                "Freeze panes, protected cells <br> and add comments", 0);
         navigationBarHelper.addNavigationItem("Simple Invoice.xlsx",
                 "Simple invoice", "Use the spreadsheet for invoices", 1);
         navigationBarHelper.addNavigationItem("Embedded Charts.xlsx",
                 "Embedded charts",
                 "Display charts from an Excel file <br> in the spreadsheet", 3);
-        navigationBarHelper.addNavigationItem("Grouping.xlsx",
-                "Grouping",
+        navigationBarHelper.addNavigationItem("Grouping.xlsx", "Grouping",
                 "Use the Excel feature for <br> grouping rows and colums", 1);
 
         // add items for class examples
@@ -245,9 +248,8 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         }
 
         boolean[] ascending = { true, true };
-        hierarchicalContainer.sort(
-                hierarchicalContainer.getContainerPropertyIds().toArray(),
-                ascending);
+        hierarchicalContainer.sort(hierarchicalContainer
+                .getContainerPropertyIds().toArray(), ascending);
 
         return hierarchicalContainer;
     }
@@ -256,8 +258,8 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         File root = null;
         try {
             ClassLoader classLoader = SpreadsheetDemoUI.class.getClassLoader();
-            URL resource = classLoader
-                    .getResource("testsheets" + File.separator);
+            URL resource = classLoader.getResource("testsheets"
+                    + File.separator);
             if (resource != null) {
                 root = new File(resource.toURI());
             }
@@ -291,10 +293,9 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     }
 
     static String splitCamelCase(String s) {
-        String replaced = s.replaceAll(
-                String.format("%s|%s|%s", "(?<=[A-Z])(?=[A-Z][a-z])",
-                        "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"),
-                " ");
+        String replaced = s.replaceAll(String.format("%s|%s|%s",
+                "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])",
+                "(?<=[A-Za-z])(?=[^A-Za-z])"), " ");
         replaced = replaced.replaceAll("Example", "");
         return replaced.trim();
     }
@@ -334,8 +335,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 "Java Source");
     }
 
-    private void addResourceTab(Class clazz, String resourceName,
-            String tabName) {
+    private void addResourceTab(Class clazz, String resourceName, String tabName) {
         try {
             InputStream resourceAsStream = clazz
                     .getResourceAsStream(resourceName);
@@ -353,8 +353,8 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         Panel p = new Panel();
         p.setWidth("100%");
         p.setStyleName(ValoTheme.PANEL_BORDERLESS);
-        code = code.replace("&", "&amp;").replace("<", "&lt;").replace(">",
-                "&gt;");
+        code = code.replace("&", "&amp;").replace("<", "&lt;")
+                .replace(">", "&gt;");
         Label c = new Label("<pre class='prettyprint'>" + code + "</pre>");
         c.setContentMode(ContentMode.HTML);
         c.setSizeUndefined();
