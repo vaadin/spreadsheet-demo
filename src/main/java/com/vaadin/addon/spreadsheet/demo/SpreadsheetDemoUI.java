@@ -27,12 +27,6 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.Container;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.FilesystemContainer;
-import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
@@ -46,10 +40,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
-import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.util.FilesystemContainer;
+import com.vaadin.v7.data.util.HierarchicalContainer;
+import com.vaadin.v7.ui.Tree;
 
 /**
  * Demo class for the Spreadsheet component.
@@ -64,7 +62,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @JavaScript("prettify.js")
 @Theme("demo-theme")
 @Title("Vaadin Spreadsheet Demo")
-public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
+public class SpreadsheetDemoUI extends UI {
 
     static final Properties prop = new Properties();
     static {
@@ -116,7 +114,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         Label logo = new Label("Vaadin Spreadsheet");
         logo.addStyleName("h3");
         logo.addStyleName("logo");
-
+        logo.setWidth(100,Unit.PERCENTAGE);
         initNavigationBarHelper();
 
         Link homepage = new Link("Home page", new ExternalResource(
@@ -140,7 +138,10 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
         tree.setItemCaptionPropertyId("displayName");
         tree.setNullSelectionAllowed(false);
         tree.setWidth("100%");
-        tree.addValueChangeListener(this);
+        tree.addValueChangeListener(e->{
+            Object value = e.getProperty().getValue();
+            open(value);
+        });
         for (Object itemId : tree.rootItemIds()) {
             tree.expandItem(itemId);
         }
@@ -299,12 +300,6 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
                 "(?<=[A-Za-z])(?=[^A-Za-z])"), " ");
         replaced = replaced.replaceAll("Example", "");
         return replaced.trim();
-    }
-
-    @Override
-    public void valueChange(ValueChangeEvent event) {
-        Object value = event.getProperty().getValue();
-        open(value);
     }
 
     private void open(Object value) {

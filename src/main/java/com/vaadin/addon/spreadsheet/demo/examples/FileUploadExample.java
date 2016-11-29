@@ -63,7 +63,6 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
 
     private void initUpload() {
         upload = new Upload("Upload excel file", this);
-        upload.setImmediate(true);
         upload.addStartedListener(this);
         upload.addProgressListener(this);
         upload.addFinishedListener(this);
