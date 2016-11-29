@@ -1,8 +1,13 @@
 package com.vaadin.addon.spreadsheet.demo.examples;
 
 import java.text.Format;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -16,8 +21,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.server.data.DataProvider;
+import com.vaadin.server.data.ListDataProvider;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -37,7 +42,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
 
     private final DateField dateField = new DateField();
 
-    private final CheckBox checkBox = new CheckBox();
+    private final CheckBox  checkBox = new CheckBox();
 
     private final Workbook testWorkbook;
 
@@ -51,7 +56,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             { "", true, Calendar.getInstance(), 500.0D,
                     "here is another button", comboBoxValues[1] } };
 
-    private final ComboBox comboBox;
+    private final ComboBox<String> comboBox;
 
     private boolean initializingComboBoxValue;
 
@@ -69,7 +74,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
 
     private NativeSelect nativeSelect;
 
-    private ComboBox comboBox2;
+    private ComboBox<String> comboBox2;
 
     private ComponentsExample componentsExample;
 
@@ -143,36 +148,25 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         Row row6 = sheet.createRow(6);
         row6.setHeightInPoints(28F);
         comboBox = new ComboBox();
-        for (String s : comboBoxValues) {
-            comboBox.addItem(s);
-        }
-        comboBox.setImmediate(true);
-        comboBox.setBuffered(false);
-        comboBox.addValueChangeListener(new ValueChangeListener() {
-
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                if (!initializingComboBoxValue) {
-                    String s = (String) comboBox.getValue();
-                    CellReference cr = getSpreadsheet()
-                            .getSelectedCellReference();
-                    Cell cell = getSpreadsheet().getCell(cr.getRow(),
-                            cr.getCol());
-                    if (cell != null) {
-                        cell.setCellValue(s);
-                        getSpreadsheet().refreshCells(cell);
-                    }
+        DataProvider<String> data = new ListDataProvider<>(Arrays.asList(comboBoxValues));
+        comboBox.setDataProvider(data);
+        comboBox.addValueChangeListener(event -> {
+            if (!initializingComboBoxValue) {
+                String s = comboBox.getValue();
+                CellReference cr = getSpreadsheet()
+                        .getSelectedCellReference();
+                Cell cell = getSpreadsheet().getCell(cr.getRow(),
+                        cr.getCol());
+                if (cell != null) {
+                    cell.setCellValue(s);
+                    getSpreadsheet().refreshCells(cell);
                 }
             }
         });
         comboBox.setWidth("100%");
         // comboBox.setWidth("100px");
 
-        dateField.setImmediate(true);
-        dateField.addValueChangeListener(new ValueChangeListener() {
-
-            @Override
-            public void valueChange(ValueChangeEvent event) {
+        dateField.addValueChangeListener(event-> {
                 CellReference selectedCellReference = getSpreadsheet()
                         .getSelectedCellReference();
                 Cell cell = getSpreadsheet().getCell(
@@ -180,7 +174,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                         selectedCellReference.getCol());
                 try {
                     Date oldValue = cell.getDateCellValue();
-                    Date value = dateField.getValue();
+                    Date value =Date.from(dateField.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
                     if (oldValue != null && !oldValue.equals(value)) {
                         cell.setCellValue(value);
                         getSpreadsheet().refreshCells(cell);
@@ -190,28 +184,23 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 } catch (NullPointerException npe) {
                     npe.printStackTrace();
                 }
-            }
         });
-        checkBox.setImmediate(true);
-        checkBox.addValueChangeListener(new ValueChangeListener() {
+        checkBox.addValueChangeListener(event -> {
 
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                CellReference selectedCellReference = getSpreadsheet()
-                        .getSelectedCellReference();
-                Cell cell = getSpreadsheet().getCell(
-                        selectedCellReference.getRow(),
-                        selectedCellReference.getCol());
-                try {
-                    Boolean value = checkBox.getValue();
-                    Boolean oldValue = cell.getBooleanCellValue();
-                    if (value != oldValue) {
-                        cell.setCellValue(value);
-                        getSpreadsheet().refreshCells(cell);
-                    }
-                } catch (IllegalStateException ise) {
-                    ise.printStackTrace();
+            CellReference selectedCellReference = getSpreadsheet()
+                    .getSelectedCellReference();
+            Cell cell = getSpreadsheet().getCell(
+                    selectedCellReference.getRow(),
+                    selectedCellReference.getCol());
+            try {
+                Boolean value = checkBox.getValue();
+                Boolean oldValue = cell.getBooleanCellValue();
+                if (value != oldValue) {
+                    cell.setCellValue(value);
+                    getSpreadsheet().refreshCells(cell);
                 }
+            } catch (IllegalStateException ise) {
+                ise.printStackTrace();
             }
         });
     }
@@ -278,20 +267,17 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 ((CheckBox) customEditor).setValue(cell.getBooleanCellValue());
             } else if (customEditor instanceof DateField) {
                 final String s = cell.getCellStyle().getDataFormatString();
-                if (s.contains("ss")) {
-                    ((DateField) customEditor).setResolution(Resolution.SECOND);
-                } else if (s.contains("mm")) {
-                    ((DateField) customEditor).setResolution(Resolution.MINUTE);
-                } else if (s.contains("h")) {
-                    ((DateField) customEditor).setResolution(Resolution.HOUR);
-                } else if (s.contains("d")) {
+                if (s.contains("d")) {
                     ((DateField) customEditor).setResolution(Resolution.DAY);
                 } else if (s.contains("m") || s.contains("mmm")) {
                     ((DateField) customEditor).setResolution(Resolution.MONTH);
                 } else {
                     ((DateField) customEditor).setResolution(Resolution.YEAR);
                 }
-                ((DateField) customEditor).setValue(cell.getDateCellValue());
+
+                LocalDate date = cell.getDateCellValue().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDate();
+                ((DateField) customEditor).setValue(date);
                 Format format = spreadsheet.getDataFormatter().createFormat(
                         cell);
                 String pattern = null;
@@ -414,7 +400,10 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             if (columnIndex == 1) {
                 if (nativeSelect == null) {
                     nativeSelect = new NativeSelect();
-                    nativeSelect.addItem("JEE");
+                    List<String> items = new ArrayList<>();
+                    items.add("JEE");
+                    DataProvider<String> data = new ListDataProvider<>(items);
+                    nativeSelect.setDataProvider(data);
                     nativeSelect.setHeight("100%");
                     nativeSelect.setWidth("100%");
                 }
@@ -422,9 +411,9 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             } else if (columnIndex == 2) {
                 if (comboBox2 == null) {
                     comboBox2 = new ComboBox();
-                    for (String s : comboBoxValues) {
-                        comboBox2.addItem(s);
-                    }
+                    DataProvider<String> data = new ListDataProvider<>(Arrays.asList(comboBoxValues));
+                    comboBox.setDataProvider(data);;
+                    comboBox2.setDataProvider(data);
                     comboBox2.setWidth("100%");
                 }
                 return comboBox2;
