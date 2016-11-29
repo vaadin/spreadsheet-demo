@@ -1,8 +1,5 @@
 package com.vaadin.addon.spreadsheet.demo.examples;
 
-import static com.vaadin.shared.ui.colorpicker.Color.BLACK;
-import static com.vaadin.shared.ui.colorpicker.Color.WHITE;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +24,6 @@ import com.vaadin.ui.ColorPicker;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
-import com.vaadin.ui.components.colorpicker.ColorChangeListener;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class BasicStylingExample
@@ -113,19 +108,13 @@ public class BasicStylingExample
         });
         backgroundColor = new ColorPicker();
         backgroundColor.setCaption("Background Color");
-        backgroundColor.addColorChangeListener(new ColorChangeListener() {
-            @Override
-            public void colorChanged(ColorChangeEvent event) {
-                updateSelectedCellsBackgroundColor(event.getColor());
-            }
-        });
+        backgroundColor.addValueChangeListener(e->
+            updateSelectedCellsBackgroundColor(e.getValue())
+        );
         fontColor = new ColorPicker();
         fontColor.setCaption("Font Color");
-        fontColor.addColorChangeListener(new ColorChangeListener() {
-            @Override
-            public void colorChanged(ColorChangeEvent event) {
-                updateSelectedCellsFontColor(event.getColor());
-            }
+        fontColor.addValueChangeListener(event->{
+                updateSelectedCellsFontColor(event.getValue());
         });
         stylingToolbar.addComponents(boldButton, backgroundColor, fontColor);
         boldButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
@@ -238,8 +227,8 @@ public class BasicStylingExample
         CellReference selectedCell = event.getSelectedCellReference();
         Cell cell = spreadsheet.getCell(selectedCell.getRow(),
                 selectedCell.getCol());
-        backgroundColor.setColor(WHITE);
-        fontColor.setColor(BLACK);
+        backgroundColor.setValue(Color.WHITE);
+        fontColor.setValue(Color.BLACK);
         if (cell != null) {
             // This cast an only be done when using .xlsx files
             XSSFCellStyle style = (XSSFCellStyle) cell.getCellStyle();
@@ -248,12 +237,12 @@ public class BasicStylingExample
                 if (font != null) {
                     XSSFColor xssfFontColor = font.getXSSFColor();
                     if (xssfFontColor != null) {
-                        fontColor.setColor(convertColor(xssfFontColor));
+                        fontColor.setValue(convertColor(xssfFontColor));
                     }
                 }
                 XSSFColor foregroundColor = style.getFillForegroundColorColor();
                 if (foregroundColor != null) {
-                    backgroundColor.setColor(convertColor(foregroundColor));
+                    backgroundColor.setValue(convertColor(foregroundColor));
                 }
             }
         }

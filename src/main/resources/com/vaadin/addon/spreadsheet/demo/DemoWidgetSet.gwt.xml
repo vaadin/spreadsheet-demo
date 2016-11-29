@@ -10,4 +10,8 @@
     <inherits name="com.vaadin.addon.charts.Widgetset" />
 
     <inherits name="com.vaadin.addon.spreadsheet.demo.DemoWidgetSet" />
+
+    
+
+    <inherits name="com.vaadin.v7.Vaadin7WidgetSet" />
 </module>
