@@ -96,6 +96,7 @@ public class SpreadsheetDemoUI extends UI implements ValueChangeListener {
     protected void init(VaadinRequest request) {
         HorizontalSplitPanel horizontalSplitPanel = new HorizontalSplitPanel();
         horizontalSplitPanel.setSplitPosition(300, Unit.PIXELS);
+        horizontalSplitPanel.setLocked(true);
         horizontalSplitPanel.addStyleName("main-layout");
 
         final Link github = new Link("Source code on Github",
