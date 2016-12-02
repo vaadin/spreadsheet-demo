@@ -1,8 +1,8 @@
 package com.vaadin.addon.spreadsheet.demo.examples;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
+import static org.reflections.util.Utils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -2,7 +2,8 @@
 
 ### Java ###
 *.class
-
+### CSS ###
+*.css
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
