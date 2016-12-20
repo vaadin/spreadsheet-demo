@@ -43,6 +43,9 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
     public FileUploadExample() {
         layout = new VerticalLayout();
         layout.setSizeFull();
+        layout.setSpacing(false);
+        layout.setMargin(false);
+
         initSpreadsheetPanel();
         layout.addComponent(createUploadLayout());
         layout.addComponent(spreadsheetPanel);
@@ -53,6 +56,7 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
         initUpload();
         initProgressBar();
         HorizontalLayout header = new HorizontalLayout();
+        header.setSpacing(false);
         header.setWidth("100%");
         header.setMargin(true);
         header.addComponents(upload, progressBar);

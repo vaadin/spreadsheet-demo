@@ -40,6 +40,8 @@ public class BasicStylingExample
     public BasicStylingExample() {
         layout = new VerticalLayout();
         layout.setSizeFull();
+        layout.setSpacing(false);
+        layout.setMargin(false);
 
         initStyleToolbar();
         initSpreadsheet();
@@ -99,6 +101,7 @@ public class BasicStylingExample
 
     private void initStyleToolbar() {
         stylingToolbar = new HorizontalLayout();
+        stylingToolbar.setSpacing(false);
         Button boldButton = new Button(FontAwesome.BOLD);
         boldButton.addClickListener(new ClickListener() {
             @Override
@@ -124,7 +127,7 @@ public class BasicStylingExample
 
     private void updateSelectedCellsBold() {
         if (spreadsheet != null) {
-            List<Cell> cellsToRefresh = new ArrayList<Cell>();
+            List<Cell> cellsToRefresh = new ArrayList<>();
             for (CellReference cellRef : spreadsheet
                     .getSelectedCellReferences()) {
                 // Obtain Cell using CellReference
@@ -147,7 +150,7 @@ public class BasicStylingExample
 
     private void updateSelectedCellsBackgroundColor(Color newColor) {
         if (spreadsheet != null && newColor != null) {
-            List<Cell> cellsToRefresh = new ArrayList<Cell>();
+            List<Cell> cellsToRefresh = new ArrayList<>();
             for (CellReference cellRef : spreadsheet
                     .getSelectedCellReferences()) {
                 // Obtain Cell using CellReference
@@ -170,7 +173,7 @@ public class BasicStylingExample
 
     private void updateSelectedCellsFontColor(Color newColor) {
         if (spreadsheet != null && newColor != null) {
-            List<Cell> cellsToRefresh = new ArrayList<Cell>();
+            List<Cell> cellsToRefresh = new ArrayList<>();
             for (CellReference cellRef : spreadsheet
                     .getSelectedCellReferences()) {
                 Cell cell = getOrCreateCell(cellRef);

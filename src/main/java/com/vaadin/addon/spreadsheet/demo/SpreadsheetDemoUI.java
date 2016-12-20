@@ -109,6 +109,8 @@ public class SpreadsheetDemoUI extends UI {
         setContent(horizontalSplitPanel);
 
         VerticalLayout content = new VerticalLayout();
+        content.setSpacing(false);
+        content.setMargin(false);
         content.setSpacing(true);
 
         Label logo = new Label("Vaadin Spreadsheet");
@@ -289,7 +291,7 @@ public class SpreadsheetDemoUI extends UI {
     private List<Class<? extends SpreadsheetExample>> getExamples() {
         Reflections reflections = new Reflections(
                 "com.vaadin.addon.spreadsheet.demo.examples");
-        List<Class<? extends SpreadsheetExample>> examples = new ArrayList<Class<? extends SpreadsheetExample>>(
+        List<Class<? extends SpreadsheetExample>> examples = new ArrayList<>(
                 reflections.getSubTypesOf(SpreadsheetExample.class));
         return examples;
     }
