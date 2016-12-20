@@ -38,6 +38,8 @@ public class ChartExample implements SpreadsheetExample {
     public ChartExample() {
         layout = new VerticalLayout();
         layout.setSizeFull();
+        layout.setSpacing(false);
+        layout.setMargin(false);
 
         initSpreadsheet();
         initCharts();
@@ -53,8 +55,9 @@ public class ChartExample implements SpreadsheetExample {
 
     private void initCharts() {
         chartsLayout = new HorizontalLayout();
+        chartsLayout.setSpacing(false);
         chartsLayout.setSizeFull();
-        charts = new ArrayList<Chart>();
+        charts = new ArrayList<>();
         charts.add(createPieChart());
         charts.add(createColumnChart());
         for (Chart chart : charts) {
@@ -145,7 +148,7 @@ public class ChartExample implements SpreadsheetExample {
             oldSeries = (DataSeries) conf.getSeries().get(0);
         }
         DataSeries series = new DataSeries();
-        Collection<String> categories = new ArrayList<String>();
+        Collection<String> categories = new ArrayList<>();
         while (!isEmpty(getStringValue(rowIndex, 0))) {
             series.add(new DataSeriesItem(getStringValue(rowIndex, 0),
                     getNumericValue(rowIndex, 1)));
