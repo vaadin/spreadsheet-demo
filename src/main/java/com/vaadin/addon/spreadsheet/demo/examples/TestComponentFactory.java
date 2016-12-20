@@ -4,7 +4,6 @@ import java.text.Format;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,8 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
-import com.vaadin.server.data.DataProvider;
-import com.vaadin.server.data.ListDataProvider;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -72,7 +69,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
 
     private boolean hidden = false;
 
-    private NativeSelect nativeSelect;
+    private NativeSelect<String> nativeSelect;
 
     private ComboBox<String> comboBox2;
 
@@ -147,9 +144,8 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         cell2.setCellStyle(lockedCellStyle);
         Row row6 = sheet.createRow(6);
         row6.setHeightInPoints(28F);
-        comboBox = new ComboBox();
-        DataProvider<String> data = new ListDataProvider<>(Arrays.asList(comboBoxValues));
-        comboBox.setDataProvider(data);
+        comboBox = new ComboBox<>();
+        comboBox.setItems(comboBoxValues);
         comboBox.addValueChangeListener(event -> {
             if (!initializingComboBoxValue) {
                 String s = comboBox.getValue();
@@ -401,21 +397,18 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         } else if (!hidden && rowIndex == 6) {
             if (columnIndex == 1) {
                 if (nativeSelect == null) {
-                    nativeSelect = new NativeSelect();
+                    nativeSelect = new NativeSelect<>();
                     List<String> items = new ArrayList<>();
                     items.add("JEE");
-                    DataProvider<String> data = new ListDataProvider<>(items);
-                    nativeSelect.setDataProvider(data);
+                    nativeSelect.setItems(items);
                     nativeSelect.setHeight("100%");
                     nativeSelect.setWidth("100%");
                 }
                 return nativeSelect;
             } else if (columnIndex == 2) {
                 if (comboBox2 == null) {
-                    comboBox2 = new ComboBox();
-                    DataProvider<String> data = new ListDataProvider<>(Arrays.asList(comboBoxValues));
-                    comboBox.setDataProvider(data);;
-                    comboBox2.setDataProvider(data);
+                    comboBox2 = new ComboBox<>();
+                    comboBox2.setItems(comboBoxValues);
                     comboBox2.setWidth("100%");
                 }
                 return comboBox2;

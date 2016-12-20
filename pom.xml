@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.vaadin.addon</groupId>
+	<groupId>com.vaadin.demo</groupId>
 	<artifactId>vaadin-spreadsheet-demo</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
@@ -17,10 +17,10 @@
 	</prerequisites>
 
 	<properties>
-		<vaadin.version>8.0.0.alpha7</vaadin.version>
-		<vaadin.plugin.version>8.0.0.alpha7</vaadin.plugin.version>
-		<spreadsheet.version>2.0.0.alpha1</spreadsheet.version>
-		<vaadin.charts.version>4.0.0-alpha2</vaadin.charts.version>
+		<vaadin.version>8.0.0.alpha9</vaadin.version>
+		<vaadin.plugin.version>8.0.0.alpha9</vaadin.plugin.version>
+		<spreadsheet.version>2.0-SNAPSHOT</spreadsheet.version>
+		<vaadin.charts.version>4.0-SNAPSHOT</vaadin.charts.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -50,12 +50,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.vaadin.addon</groupId>
+			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spreadsheet</artifactId>
 			<version>${spreadsheet.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.vaadin.addon</groupId>
+			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spreadsheet-charts</artifactId>
 			<version>${spreadsheet.version}</version>
 		</dependency>
