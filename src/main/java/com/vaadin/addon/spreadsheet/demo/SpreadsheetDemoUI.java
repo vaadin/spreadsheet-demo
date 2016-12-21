@@ -109,7 +109,6 @@ public class SpreadsheetDemoUI extends UI {
         setContent(horizontalSplitPanel);
 
         VerticalLayout content = new VerticalLayout();
-        content.setSpacing(false);
         content.setMargin(false);
         content.setSpacing(true);
 
