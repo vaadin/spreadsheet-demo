@@ -32,6 +32,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
@@ -151,8 +153,18 @@ public class SpreadsheetDemoUI extends UI {
         panel.setSizeFull();
         panel.setStyleName("panel");
 
+        Button feedback = new Button("Got feedback?");
+        feedback.setIcon(FontAwesome.COMMENTING_O);
+        feedback.addStyleName("feedback-button");
+        feedback.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        feedback.addStyleName(ValoTheme.BUTTON_TINY);
+        feedback.addClickListener(e -> {
+            getUI().addWindow(new FeedbackForm());
+        });
+
         content.setSizeFull();
-        content.addComponents(logo, links, panel, github, version);
+        content.addComponents(logo, links, feedback, panel, github, version);
+        content.setComponentAlignment(feedback, Alignment.MIDDLE_CENTER);
         content.setExpandRatio(panel, 1);
 
         horizontalSplitPanel.setFirstComponent(content);
