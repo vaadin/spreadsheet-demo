@@ -6,6 +6,7 @@ $v-link-text-decoration: none;
 $v-bevel: false;
 $v-shadow: false;
 $v-gradient: false;
+$v-included-additional-styles: button;
 
 @import "../valo/valo.scss";
 @import "prettify.scss";
@@ -119,7 +120,7 @@ $v-gradient: false;
     padding-right: 10px;
   }
 
-  .v-icon + span {
+  .v-icon + span:not(.v-button-caption) {
     margin-left: 14px;
     position: relative;
     bottom: 4px;
@@ -140,6 +141,40 @@ $v-gradient: false;
       background-image: url("vaadin-spreadsheet-logo.png");
     }
   }
+  
+   #feedback, #email {
+     border-radius: 5px;
+     border: 1px solid #bbb; 
+     width: 100%;
+     font-size: 20px;
+     padding: 10px;
+     max-width:100%;
+     box-sizing: border-box;
+     opacity: 1;
+   }
+
+   #feedback-title {
+     margin-top:0;
+   }
+
+   #panel {
+     padding:30px;
+   }
+
+   #feedback {
+     height: 5em;
+   }
+
+   #submit {
+     padding: 0.4em 0.8em;
+     border: none;
+     background: $v-focus-color;
+     color: white;
+     line-height: 30px;
+     font-size: 20px;
+     margin-top: 30px;
+     border-radius: 5px;
+   }
 
   pre.prettyprint {
     font-size: $v-font-size--small;
