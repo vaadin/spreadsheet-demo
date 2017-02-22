@@ -20,8 +20,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.addon.spreadsheet.SpreadsheetComponentFactory;
-import com.vaadin.shared.ui.datefield.Resolution;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
@@ -264,11 +264,14 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
             } else if (customEditor instanceof DateField) {
                 final String s = cell.getCellStyle().getDataFormatString();
                 if (s.contains("d")) {
-                    ((DateField) customEditor).setResolution(Resolution.DAY);
+                    ((DateField) customEditor)
+                            .setResolution(DateResolution.DAY);
                 } else if (s.contains("m") || s.contains("mmm")) {
-                    ((DateField) customEditor).setResolution(Resolution.MONTH);
+                    ((DateField) customEditor)
+                            .setResolution(DateResolution.MONTH);
                 } else {
-                    ((DateField) customEditor).setResolution(Resolution.YEAR);
+                    ((DateField) customEditor)
+                            .setResolution(DateResolution.YEAR);
                 }
 
                 if(cell.getDateCellValue()!=null) {
