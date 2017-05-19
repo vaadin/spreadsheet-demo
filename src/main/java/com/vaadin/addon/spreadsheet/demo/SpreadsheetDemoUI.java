@@ -123,7 +123,7 @@ public class SpreadsheetDemoUI extends UI {
         Link homepage = new Link("Home page", new ExternalResource(
                 "https://vaadin.com/spreadsheet"));
         Link javadoc = new Link("JavaDoc", new ExternalResource(
-                "http://demo.vaadin.com/javadoc/com.vaadin.addon/vaadin-spreadsheet/"
+                "http://demo.vaadin.com/javadoc/com.vaadin/vaadin-spreadsheet/"
                         + getVersion() + "/"));
         Link manual = new Link(
                 "Manual",
