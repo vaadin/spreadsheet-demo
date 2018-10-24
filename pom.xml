@@ -19,7 +19,7 @@
 	<properties>
 		<vaadin.version>8.0.0</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<spreadsheet.version>2.1.0.alpha1</spreadsheet.version>
+		<spreadsheet.version>2.1.0.alpha2</spreadsheet.version>
 		<vaadin.charts.version>4.0.0</vaadin.charts.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,7 +32,7 @@
 	<repositories>
 		<repository>
 			<id>vaadin-addons</id>
-			<url>http://maven.vaadin.com/vaadin-addons</url>
+			<url>http://tools.vaadin.com/nexus/content/repositories/vaadin-addons</url>
 		</repository>
 	</repositories>
 
