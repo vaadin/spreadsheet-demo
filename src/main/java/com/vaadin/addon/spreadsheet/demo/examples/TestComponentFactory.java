@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -79,7 +80,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         testWorkbook = new XSSFWorkbook();
         final Sheet sheet = getTestWorkbook().createSheet("Custom Components");
         Row lastRow = sheet.createRow(100);
-        lastRow.createCell(100, Cell.CELL_TYPE_BOOLEAN).setCellValue(true);
+        lastRow.createCell(100, CellType.BOOLEAN).setCellValue(true);
         sheet.setColumnWidth(0, 7800);
         sheet.setColumnWidth(1, 3800);
         sheet.setColumnWidth(2, 6100);
@@ -95,9 +96,9 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
                 Object value = data[i][j];
                 if (i == 0 || j == 0 || j == 4 || j == 5) {
                     // string cells
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cell.setCellType(CellType.STRING);
                 } else if (j == 2 || j == 3) {
-                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                    cell.setCellType(CellType.NUMERIC);
                 }
                 final DataFormat format = getTestWorkbook().createDataFormat();
                 if (value != null) {
@@ -259,7 +260,7 @@ public class TestComponentFactory implements SpreadsheetComponentFactory {
         }
 
         if (cell != null) {
-            if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+            if (cell.getCellType() == CellType.BOOLEAN) {
                 ((CheckBox) customEditor).setValue(cell.getBooleanCellValue());
             } else if (customEditor instanceof DateField) {
                 final String s = cell.getCellStyle().getDataFormatString();
