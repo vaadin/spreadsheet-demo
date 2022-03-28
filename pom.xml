@@ -1,237 +1,194 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.vaadin.demo</groupId>
-	<artifactId>vaadin-spreadsheet-demo</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>war</packaging>
-	<name>Spreadsheet Add-on Demo</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.vaadin.demo</groupId>
+    <artifactId>vaadin-spreadsheet-flow-demo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <name>Spreadsheet Flow Demo</name>
 
-	<organization>
-		<name>Vaadin Ltd</name>
-		<url>https://vaadin.com</url>
-	</organization>
-	<prerequisites>
-		<maven>3</maven>
-	</prerequisites>
+    <organization>
+        <name>Vaadin Ltd</name>
+        <url>https://vaadin.com</url>
+    </organization>
 
-	<properties>
-		<vaadin.version>8.14.1</vaadin.version>
-		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<spreadsheet.version>2.1.1</spreadsheet.version>
-		<vaadin.charts.version>4.0.0</vaadin.charts.version>
-		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
-		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
-	</properties>
+    <properties>
+        <java.version>11</java.version>
+        <vaadin.version>23.0.1</vaadin.version>
+        <flow.version>${vaadin.version}</flow.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <jetty.version>9.4.45.v20220203</jetty.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
 
-	<repositories>
-		<repository>
-			<id>vaadin-addons</id>
-			<url>https://tools.vaadin.com/nexus/content/repositories/vaadin-addons</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <!-- The order of definitions matters. Explicitly defining central here to make sure it has the highest priority. -->
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-bom</artifactId>
-				<version>${vaadin.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+        <!-- Main Maven repository -->
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>vaadin-prereleases</id>
+            <url>
+                https://maven.vaadin.com/vaadin-prereleases/
+            </url>
+        </repository>
+        <!-- Repository used by many Vaadin add-ons: https://vaadin.com/directory -->
+        <repository>
+            <id>Vaadin Directory</id>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>vaadin-prereleases</id>
+            <url>
+                https://maven.vaadin.com/vaadin-prereleases/
+            </url>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-spreadsheet</artifactId>
-			<version>${spreadsheet.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-spreadsheet-charts</artifactId>
-			<version>${spreadsheet.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>0.9.10</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-compatibility-server</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-compatibility-client</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-compatibility-shared</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiled</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-themes</artifactId>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <!-- Replace artifactId with vaadin-core to use only free components -->
+            <artifactId>vaadin</artifactId>
+            <exclusions>
+                <!-- Fusion is only supported in Spring Boot currently, exclude obsolete dependencies -->
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>fusion-endpoint</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<!-- Exclude an unnecessary file generated by the GWT compiler. -->
-					<packagingExcludes>WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**</packagingExcludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>${vaadin.plugin.version}</version>
-				<configuration>
-					<extraJvmArgs>-Xms512M -Xmx2g</extraJvmArgs>
-					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
-					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets</hostedWebapp>
-					<noServer>true</noServer>
-					<persistentunitcachedir>${basedir}/target/tmp/gwt-unitCache</persistentunitcachedir>
-					<compileReport>true</compileReport>
-					<!--<strict>true</strict>-->
-					<runTarget>http://localhost:8080/</runTarget>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>resources</goal>
-							<goal>update-theme</goal>
-							<goal>update-widgetset</goal>
-							<goal>compile</goal>
-							<!-- Comment out compile-theme goal to use on-the-fly theme compilation -->
-							<goal>compile-theme</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
-				<!-- Clean up also any pre-compiled themes -->
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>src/main/webapp/VAADIN/themes</directory>
-							<includes>
-								<include>**/styles.css</include>
-								<include>**/styles.scss.cache</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
+        <!-- Added to provide logging output as Flow uses -->
+        <!-- the unbound SLF4J no-operation (NOP) logger implementation -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
 
-			<!-- The Jetty plugin allows us to easily test the development build by
-				running jetty:run on the command line. -->
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.plugin.version}</version>
-				<configuration>
-					<webApp>
-						<contextPath>/</contextPath>
-					</webApp>
-					<scanIntervalSeconds>2</scanIntervalSeconds>
-				</configuration>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/config.properties</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-spreadsheet-flow</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-	<profiles>
-		<profile>
-			<!-- Vaadin pre-release repositories -->
-			<id>vaadin-prerelease</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-testbench</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-			<repositories>
-				<repository>
-					<id>vaadin-prereleases</id>
-					<url>https://maven.vaadin.com/vaadin-prereleases</url>
-				</repository>
-				<repository>
-					<id>vaadin-snapshots</id>
-					<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-			</repositories>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>vaadin-prereleases</id>
-					<url>https://maven.vaadin.com/vaadin-prereleases</url>
-				</pluginRepository>
-				<pluginRepository>
-					<id>vaadin-snapshots</id>
-					<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</pluginRepository>
-			</pluginRepositories>
-		</profile>
-	</profiles>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
+    <build>
+        <defaultGoal>jetty:run</defaultGoal>
+        <plugins>
+            <!-- We use jetty plugin, replace it with your favourite developing servlet container -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <configuration>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
+                </configuration>
+            </plugin>
+
+            <!--
+                Take care of synchronizing java dependencies and imports in
+                package.json and main.js files.
+                It also creates webpack.config.js if not exists yet.
+            -->
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-frontend</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- Production mode is activated using -Pproduction -->
+            <id>production</id>
+            <properties>
+                <vaadin.productionMode>true</vaadin.productionMode>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>flow-server-production-mode</artifactId>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <version>${vaadin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-frontend</goal>
+                                </goals>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
