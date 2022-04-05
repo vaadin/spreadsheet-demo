@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <vaadin.version>23.0.1</vaadin.version>
+        <vaadin.version>23.1-SNAPSHOT</vaadin.version>
         <flow.version>${vaadin.version}</flow.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spreadsheet-flow</artifactId>
-            <version>${project.version}</version>
+            <version>${vaadin.version}</version>
         </dependency>
 
         <dependency>
