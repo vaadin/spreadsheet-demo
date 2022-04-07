@@ -101,12 +101,6 @@
 
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-spreadsheet-flow</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench</artifactId>
             <scope>test</scope>
         </dependency>
