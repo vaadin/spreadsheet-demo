@@ -23,6 +23,7 @@
         <jetty.version>9.4.45.v20220203</jetty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <vaadin.pnpm.enable>true</vaadin.pnpm.enable>
     </properties>
 
     <repositories>
@@ -142,6 +143,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <pnpmEnable>${vaadin.pnpm.enable}</pnpmEnable>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -180,6 +184,9 @@
                                 <phase>compile</phase>
                             </execution>
                         </executions>
+                        <configuration>
+                            <pnpmEnable>${vaadin.pnpm.enable}</pnpmEnable>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
