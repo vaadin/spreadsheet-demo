@@ -37,7 +37,7 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
 
     private HorizontalLayout createStyleToolbar() {
         HorizontalLayout stylingToolbar = new HorizontalLayout();
-        //stylingToolbar.setSpacing(false);
+        // stylingToolbar.setSpacing(false);
         Button boldButton = new Button(new Icon(VaadinIcon.BOLD));
         boldButton.addClickListener(event -> updateSelectedCellsBold());
 
@@ -79,7 +79,7 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
                 // Clone Cell CellStyle
                 // This cast an only be done when using .xlsx files
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                XSSFColor color = new XSSFColor(newColor);
+                XSSFColor color = new XSSFColor(newColor, null);
                 // Set new color value
                 style.setFillForegroundColor(color);
                 cell.setCellStyle(style);
@@ -99,7 +99,7 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
                 Cell cell = getOrCreateCell(cellRef);
                 // Workbook workbook = spreadsheet.getWorkbook();
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
-                XSSFColor color = new XSSFColor(newColor);
+                XSSFColor color = new XSSFColor(newColor, null);
                 XSSFFont font = (XSSFFont) cloneFont(style);
                 font.setColor(color);
                 style.setFont(font);
@@ -138,7 +138,6 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
         }
         return newFont;
     }
-
 
     private Cell getOrCreateCell(CellReference cellRef) {
         Cell cell = spreadsheet.getCell(cellRef.getRow(), cellRef.getCol());
@@ -205,8 +204,8 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
         CellReference selectedCell = event.getSelectedCellReference();
         Cell cell = spreadsheet.getCell(selectedCell.getRow(),
                 selectedCell.getCol());
-        //backgroundColor.setValue(Color.WHITE);
-        //fontColor.setValue(Color.BLACK);
+        // backgroundColor.setValue(Color.WHITE);
+        // fontColor.setValue(Color.BLACK);
         if (cell != null) {
             // This cast an only be done when using .xlsx files
             XSSFCellStyle style = (XSSFCellStyle) cell.getCellStyle();
@@ -215,12 +214,12 @@ public class FormattingExample extends Div implements Spreadsheet.SelectionChang
                 if (font != null) {
                     XSSFColor xssfFontColor = font.getXSSFColor();
                     if (xssfFontColor != null) {
-                        //fontColor.setValue(convertColor(xssfFontColor));
+                        // fontColor.setValue(convertColor(xssfFontColor));
                     }
                 }
                 XSSFColor foregroundColor = style.getFillForegroundColorColor();
                 if (foregroundColor != null) {
-                    //backgroundColor.setValue(convertColor(foregroundColor));
+                    // backgroundColor.setValue(convertColor(foregroundColor));
                 }
             }
         }
