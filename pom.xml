@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <vaadin.version>23.1-SNAPSHOT</vaadin.version>
+        <vaadin.version>23.3-SNAPSHOT</vaadin.version>
         <flow.version>${vaadin.version}</flow.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -91,6 +91,12 @@
                     <artifactId>fusion-endpoint</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-spreadsheet-flow</artifactId>
+            <version>${flow.version}</version>
         </dependency>
 
         <!-- Added to provide logging output as Flow uses -->
