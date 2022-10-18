@@ -12,12 +12,9 @@ import org.apache.commons.io.IOUtils;
 
 import com.example.application.views.demo.views.BasicFunctionalityExample;
 import com.example.application.views.demo.views.CollaborativeExample;
-import com.example.application.views.demo.views.DataBindingExample;
-import com.example.application.views.demo.views.EmbeddedChartsExample;
 import com.example.application.views.demo.views.FileUploadExample;
 import com.example.application.views.demo.views.FormattingExample;
 import com.example.application.views.demo.views.GroupingExample;
-import com.example.application.views.demo.views.InlineComponentsExample;
 import com.example.application.views.demo.views.ReportModeExample;
 import com.example.application.views.demo.views.SimpleInvoiceExample;
 import com.example.application.views.main.MainView;
@@ -88,9 +85,6 @@ public class DemoView extends VerticalLayout implements BeforeEnterObserver, Has
             case "reportMode": demoInstance = new ReportModeExample(); break;
             case "simpleInvoice": demoInstance = new SimpleInvoiceExample(); break;
             case "upload": demoInstance = new FileUploadExample(); break;
-            case "inlineComponents": demoInstance = new InlineComponentsExample(); break;
-            case "dataBinding": demoInstance = new DataBindingExample(); break;
-            case "embeddedCharts": demoInstance = new EmbeddedChartsExample(); break;
             default: demoInstance = new Text("demoID " + parameter + " is not supported"); break;
         }
         try {

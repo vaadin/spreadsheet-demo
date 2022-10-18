@@ -22,7 +22,6 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.router.PageTitle;
 
 import com.example.application.views.demo.DemoView;
-import com.example.application.views.demoUI.DemoUIView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -80,8 +79,7 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("DemoUI", DemoUIView.class, "Multiple tests")
-                , createTab("Basic functionality", DemoView.class, "basic", "Edit imported Excel file with "
+        return new Tab[]{createTab("Basic functionality", DemoView.class, "basic", "Edit imported Excel file with "
                         + "<br>formatting, basic formulas, and a <br>chart. "
                         + "Updates dynamically when <br> values are edited.")
                 , createTab("Collaborative features", DemoView.class, "collaborative", "Freeze panes, protected cells <br> and add comments")
@@ -90,9 +88,6 @@ public class MainView extends AppLayout {
                 , createTab("Report mode", DemoView.class, "reportMode", "Use the read only mode <br> of spreadsheet")
                 , createTab("Simple invoice", DemoView.class, "simpleInvoice", "Use the spreadsheet for invoices")
                 , createTab("Upload Excel files", DemoView.class, "upload", "Upload a .xlsx or .xls file")
-                , createTab("Use inline components", DemoView.class, "inlineComponents", "Use Vaadin components within <br> a spreadsheet", false)
-                , createTab("Data binding", DemoView.class, "dataBinding", "Display spreadsheet data <br> using Vaadin charts", false)
-                , createTab("Embedded charts", DemoView.class, "embeddedCharts", "Display charts from an Excel file <br> in the spreadsheet", false)
         };
     }
 
