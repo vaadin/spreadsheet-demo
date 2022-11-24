@@ -90,9 +90,6 @@ public class MainView extends AppLayout {
                 , createTab("Report mode", DemoView.class, "reportMode", "Use the read only mode <br> of spreadsheet")
                 , createTab("Simple invoice", DemoView.class, "simpleInvoice", "Use the spreadsheet for invoices")
                 , createTab("Upload Excel files", DemoView.class, "upload", "Upload a .xlsx or .xls file")
-                , createTab("Use inline components", DemoView.class, "inlineComponents", "Use Vaadin components within <br> a spreadsheet", false)
-                , createTab("Data binding", DemoView.class, "dataBinding", "Display spreadsheet data <br> using Vaadin charts", false)
-                , createTab("Embedded charts", DemoView.class, "embeddedCharts", "Display charts from an Excel file <br> in the spreadsheet", false)
         };
     }
 
