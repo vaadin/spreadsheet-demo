@@ -15,12 +15,12 @@
     </organization>
 
     <properties>
-        <java.version>11</java.version>
-        <vaadin.version>23.3-SNAPSHOT</vaadin.version>
+        <java.version>17</java.version>
+        <vaadin.version>24.0.0</vaadin.version>
         <flow.version>${vaadin.version}</flow.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <jetty.version>9.4.45.v20220203</jetty.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <jetty.version>11.0.13</jetty.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <vaadin.pnpm.enable>true</vaadin.pnpm.enable>
@@ -113,9 +113,9 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -127,7 +127,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
+                <version>11.0.13</version>
                 <configuration>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                 </configuration>
