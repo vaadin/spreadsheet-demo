@@ -75,7 +75,7 @@ class CellListSelectComponent extends CustomField<String> {
             sheet.refreshCells(cell);
             context.closePopup();
         });
-        listSelect.setDataProvider(new ListDataProvider<>(values));
+        listSelect.setItems(new ListDataProvider<>(values));
         listSelect.setSizeFull();
     }
 
