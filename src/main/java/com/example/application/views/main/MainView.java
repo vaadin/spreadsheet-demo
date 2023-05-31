@@ -79,7 +79,7 @@ public class MainView extends AppLayout {
         return tabs;
     }
 
-    private Component[] createMenuItems() {
+    private Tab[] createMenuItems() {
         return new Tab[]{createTab("DemoUI", DemoUIView.class, "Multiple tests")
                 , createTab("Basic functionality", DemoView.class, "basic", "Edit imported Excel file with "
                         + "<br>formatting, basic formulas, and a <br>chart. "
