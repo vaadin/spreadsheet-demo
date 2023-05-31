@@ -22,10 +22,8 @@ class Instantiator<T> {
 
     public T getIt() {
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

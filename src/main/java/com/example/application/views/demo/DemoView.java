@@ -104,12 +104,12 @@ public class DemoView extends VerticalLayout implements BeforeEnterObserver, Has
         }
     }
 
-    private String getSource(Class clazz) throws IOException {
+    private String getSource(Class<?> clazz) throws IOException {
         InputStream resourceAsStream = clazz.getResourceAsStream(clazz.getSimpleName() + ".java");
         
         String code = "";
         if (resourceAsStream != null) {
-            code = IOUtils.toString(resourceAsStream);
+            code = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         }  else {
         	File file = new File("./src/main/java/", clazz.getName().replace('.', '/') + ".java");
         	if (file.canRead()) {
