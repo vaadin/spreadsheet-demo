@@ -1,15 +1,14 @@
 package com.vaadin.addon.spreadsheet.demo.examples;
 
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_FORMULA;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 import static org.reflections.util.Utils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -106,7 +105,7 @@ public class ChartExample implements SpreadsheetExample {
         });
         CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
                 .createCellStyle();
-        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        backgroundColorStyle.setFillBackgroundColor(HSSFColorPredefined.YELLOW.getIndex());
         Cell cell = spreadsheet.createCell(0, 0,
                 "Edit this spreadsheet to alter chart title and data");
         cell.setCellStyle(backgroundColorStyle);
@@ -166,7 +165,7 @@ public class ChartExample implements SpreadsheetExample {
     private String getStringValue(int rowIndex, int columnIndex) {
         Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
         if (cell != null) {
-            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellType(CellType.STRING);
             return cell.getStringCellValue();
         }
         return null;
@@ -174,9 +173,9 @@ public class ChartExample implements SpreadsheetExample {
 
     private Double getNumericValue(int rowIndex, int columnIndex) {
         Cell cell = spreadsheet.getCell(rowIndex, columnIndex);
-        if (cell != null && (cell.getCellType() == CELL_TYPE_NUMERIC
-                || (cell.getCellType() == CELL_TYPE_FORMULA && cell
-                        .getCachedFormulaResultType() == CELL_TYPE_NUMERIC))) {
+        if (cell != null && (cell.getCellType() == CellType.NUMERIC
+                || (cell.getCellType() == CellType.FORMULA && cell
+                        .getCachedFormulaResultType() == CellType.NUMERIC))) {
             return cell.getNumericCellValue();
         }
         return 0d;

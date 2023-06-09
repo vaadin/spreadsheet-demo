@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -83,7 +83,7 @@ public class FileUploadExample implements SpreadsheetExample, Receiver,
         Spreadsheet spreadsheet = new Spreadsheet();
         CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
                 .createCellStyle();
-        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        backgroundColorStyle.setFillBackgroundColor(HSSFColorPredefined.YELLOW.getIndex());
         Cell cell = spreadsheet.createCell(0, 0,
                 "Click the upload button to choose and upload an excel file.");
         cell.setCellStyle(backgroundColorStyle);
