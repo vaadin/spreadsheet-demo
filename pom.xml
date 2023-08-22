@@ -17,7 +17,6 @@
     <properties>
         <java.version>17</java.version>
         <vaadin.version>24.1.6</vaadin.version>
-        <flow.version>${vaadin.version}</flow.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <jetty.version>11.0.13</jetty.version>
@@ -96,7 +95,6 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spreadsheet-flow</artifactId>
-            <version>${flow.version}</version>
         </dependency>
 
         <!-- Added to provide logging output as Flow uses -->
