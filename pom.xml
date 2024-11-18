@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.vaadin.demo</groupId>
 	<artifactId>vaadin-spreadsheet-demo</artifactId>
@@ -17,14 +17,16 @@
 	</prerequisites>
 
 	<properties>
-		<vaadin.version>8.14.1</vaadin.version>
-		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<spreadsheet.version>2.1.1</spreadsheet.version>
-		<vaadin.charts.version>4.0.0</vaadin.charts.version>
-		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<vaadin.version>8.14.4</vaadin.version>
+		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+		<spreadsheet.version>3.0-SNAPSHOT</spreadsheet.version>
+		<vaadin.charts.version>4.3.4</vaadin.charts.version>
+		<jetty.plugin.version>9.4.54.v20240208</jetty.plugin.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
 		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
 	</properties>
@@ -50,6 +52,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.17.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spreadsheet</artifactId>
 			<version>${spreadsheet.version}</version>
@@ -73,17 +80,14 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-compatibility-server</artifactId>
-			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-compatibility-client</artifactId>
-			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-compatibility-shared</artifactId>
-			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -127,7 +131,7 @@
 					<persistentunitcachedir>${basedir}/target/tmp/gwt-unitCache</persistentunitcachedir>
 					<compileReport>true</compileReport>
 					<!--<strict>true</strict>-->
-					<runTarget>http://localhost:8080/</runTarget>
+					<runTarget>https://localhost:8080/</runTarget>
 				</configuration>
 				<executions>
 					<execution>
