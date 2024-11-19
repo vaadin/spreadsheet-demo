@@ -23,7 +23,7 @@
 		<vaadin.version>8.14.4</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<spreadsheet.version>3.0-SNAPSHOT</spreadsheet.version>
-		<vaadin.charts.version>4.3.4</vaadin.charts.version>
+		<vaadin.charts.version>4.3.5</vaadin.charts.version>
 		<jetty.plugin.version>9.4.54.v20240208</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
