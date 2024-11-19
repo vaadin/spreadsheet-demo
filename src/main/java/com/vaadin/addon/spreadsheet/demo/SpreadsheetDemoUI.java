@@ -60,7 +60,7 @@ import com.vaadin.v7.ui.Tree;
  * 
  * 
  */
-@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@SuppressWarnings({ "serial", "rawtypes", "unchecked", "deprecation" })
 @JavaScript("prettify.js")
 @Theme("demo-theme")
 @Title("Vaadin Spreadsheet Demo")

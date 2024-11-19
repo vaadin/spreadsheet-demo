@@ -3,7 +3,7 @@ package com.vaadin.addon.spreadsheet.demo.examples;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -26,6 +26,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@SuppressWarnings("deprecation")
 public class BasicStylingExample
         implements SpreadsheetExample, SelectionChangeListener {
 
@@ -63,7 +64,8 @@ public class BasicStylingExample
         fontBoldExample.setBold(true);
         CellStyle fontBoldExampleStyle = spreadsheet.getWorkbook()
                 .createCellStyle();
-        fontBoldExampleStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        fontBoldExampleStyle
+                .setFillBackgroundColor(HSSFColorPredefined.YELLOW.getIndex());
         fontBoldExampleStyle.setFont(fontBoldExample);
         Cell fontExampleCell = spreadsheet.createCell(0, 0,
                 "Click the 'B' button in the top left corner to toggle bold font on and off.");
@@ -71,16 +73,18 @@ public class BasicStylingExample
 
         CellStyle backgroundColorStyle = spreadsheet.getWorkbook()
                 .createCellStyle();
-        backgroundColorStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        backgroundColorStyle
+                .setFillBackgroundColor(HSSFColorPredefined.YELLOW.getIndex());
         Cell backgroundExampleCell = spreadsheet.createCell(2, 0,
                 "Click the 'Background Color' button to select and change the background color of a cell.");
         backgroundExampleCell.setCellStyle(backgroundColorStyle);
 
         Font fontColorExample = spreadsheet.getWorkbook().createFont();
-        fontColorExample.setColor(HSSFColor.LIGHT_BLUE.index);
+        fontColorExample.setColor(HSSFColorPredefined.LIGHT_BLUE.getIndex());
         CellStyle fontColorExampleStyle = spreadsheet.getWorkbook()
                 .createCellStyle();
-        fontColorExampleStyle.setFillBackgroundColor(HSSFColor.YELLOW.index);
+        fontColorExampleStyle
+                .setFillBackgroundColor(HSSFColorPredefined.YELLOW.getIndex());
         fontColorExampleStyle.setFont(fontColorExample);
         Cell fontColorExampleCell = spreadsheet.createCell(4, 0,
                 "Click the 'Font Color' button to select and change the font color of a cell.");
