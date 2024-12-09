@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <vaadin.version>23.5.12</vaadin.version>
+        <vaadin.version>23.5.13</vaadin.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <jetty.version>9.4.45.v20220203</jetty.version>
