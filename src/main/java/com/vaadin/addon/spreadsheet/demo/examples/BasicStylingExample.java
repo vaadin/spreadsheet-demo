@@ -163,7 +163,7 @@ public class BasicStylingExample
                 // This cast an only be done when using .xlsx files
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
                 XSSFColor color = new XSSFColor(
-                        java.awt.Color.decode(newColor.getCSS()));
+                        java.awt.Color.decode(newColor.getCSS()), null);
                 // Set new color value
                 style.setFillForegroundColor(color);
                 cell.setCellStyle(style);
@@ -184,7 +184,7 @@ public class BasicStylingExample
                 // Workbook workbook = spreadsheet.getWorkbook();
                 XSSFCellStyle style = (XSSFCellStyle) cloneStyle(cell);
                 XSSFColor color = new XSSFColor(
-                        java.awt.Color.decode(newColor.getCSS()));
+                        java.awt.Color.decode(newColor.getCSS()), null);
                 XSSFFont font = (XSSFFont) cloneFont(style);
                 font.setColor(color);
                 style.setFont(font);
