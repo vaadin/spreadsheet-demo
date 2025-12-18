@@ -1,5 +1,7 @@
 package com.example.application.views.main;
 
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+
 import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
@@ -28,7 +30,8 @@ import com.example.application.views.demoUI.DemoUIView;
  * The main view is a top-level placeholder for other views.
  */
 @CssImport("./views/main/main-view.css")
-public class MainView extends AppLayout {
+@AnonymousAllowed
+public class MainView extends AppLayout implements com.vaadin.flow.router.AfterNavigationObserver {
 
     private final Tabs menu;
     private H1 viewTitle;
@@ -115,9 +118,11 @@ public class MainView extends AppLayout {
     }
 
     @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
-        getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
+    
+
+    public void afterNavigation(com.vaadin.flow.router.AfterNavigationEvent event) {
+
+    getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
         viewTitle.setText(getCurrentPageTitle());
     }
 
